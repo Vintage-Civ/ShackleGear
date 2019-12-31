@@ -1,0 +1,10 @@
+{
+  code: "shackle",
+  creativeinventory: { "general": ["*"] },
+  texture: { base: "item/shackle" },
+  attributes: {
+    "test": 0
+  },
+  class: "shackleitem",
+  
+}

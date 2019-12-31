@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{f8ec9353-897a-46bf-847c-8cb9fcddb2e0}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>shacklegear</RootNamespace>
+    <AssemblyName>shacklegear</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\bin\Debug\shacklegear\</OutputPath>
+    <IntermediateOutputPath>..\..\obj\Debug\shacklegear\</IntermediateOutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\bin\Release\shacklegear\</OutputPath>
+    <IntermediateOutputPath>..\..\obj\Release\shacklegear\</IntermediateOutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="VintagestoryAPI">
+      <HintPath>/home/marcus/ApplicationData/vintagestory/VintagestoryAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="VSSurvivalMod">
+      <HintPath>/home/marcus/ApplicationData/vintagestory/Mods\VSSurvivalMod.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="VSEssentials">
+      <HintPath>/home/marcus/ApplicationData/vintagestory/Mods\VSEssentials.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="VSCreativeMod">
+      <HintPath>/home/marcus/ApplicationData/vintagestory/Mods\VSCreativeMod.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>/home/marcus/ApplicationData/vintagestory/Lib\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="assets\" />
+    <Folder Include="src\" />
+    <Content Include="assets\shacklegear\itemtypes\shackle.json" />
+    <Content Include="assets\shacklegear\lang\en.json" />
+    <Content Include="assets\shacklegear\textures\item\shackle.png" />
+    <Content Include="modinfo.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="src\Commands\ppDebug.cs" />
+    <Compile Include="src\Commands\ppFree.cs" />
+    <Compile Include="src\Commands\ppGetUID.cs" />
+    <Compile Include="src\Commands\ppLocate.cs" />
+    <Compile Include="src\Commands\ppWho.cs" />
+    <Compile Include="src\Commands\ppxFree.cs" />
+    <Compile Include="src\Commands\ppxPearl.cs" />
+    <Compile Include="src\Controllers\CommandCreator.cs" />
+    <Compile Include="src\Controllers\PrisonController.cs" />
+    <Compile Include="src\Datasource\TrackData.cs" />
+    <Compile Include="src\Datasource\Tracker.cs" />
+    <Compile Include="src\Items\shackleItem.cs" />
+    <Compile Include="src\Listeners\DeathListener.cs" />
+    <Compile Include="src\Listeners\DespawnListener.cs" />
+    <Compile Include="src\Listeners\LogoutListener.cs" />
+    <Compile Include="src\main.cs" />
+    <Compile Include="src\RedirectLogs.cs" />
+    <Compile Include="src\Utility\Config.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>
