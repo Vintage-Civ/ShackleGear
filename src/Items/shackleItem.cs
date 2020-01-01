@@ -1,3 +1,4 @@
+using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
@@ -5,7 +6,7 @@ using Vintagestory.API.Server;
 
 namespace VSModLauncher.Items
 {
-    public class shackleItem : Item
+    public class ItemShackleGear : Item
     {
         private ICoreServerAPI sapi;
 
@@ -48,7 +49,6 @@ namespace VSModLauncher.Items
         {
             if (byEntity.World is IClientWorldAccessor)
             {
-
                 FpHandTransform.Rotation.Y = GameMath.Mod(byEntity.World.ElapsedMilliseconds / 50f, 360);
                 TpHandTransform.Rotation.Y = GameMath.Mod(byEntity.World.ElapsedMilliseconds / 50f, 360);
             }
@@ -66,6 +66,11 @@ namespace VSModLauncher.Items
                 Vec3d pos = entityItem.LocalPos.XYZ;
                 pos.Y += 0.15f + bobbing;
             }
+        }
+
+        public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
+        {
+            base.GetHeldItemInfo(inSlot, dsc.AppendLine("Imprisoned UID: " + inSlot.Itemstack.Attributes.GetString("pearled_uid", "Empty")), world, withDebugInfo);
         }
     }
 }

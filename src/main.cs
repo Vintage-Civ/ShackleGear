@@ -9,7 +9,7 @@ namespace VSModLauncher {
         public override void Start(ICoreAPI api) {
             base.Start(api);
             //start both client and server side
-            api.RegisterItemClass("shackleitem", typeof(shackleItem));
+            api.RegisterItemClass("shackleitem", typeof(ItemShackleGear));
         }
 
         public override void StartServerSide(ICoreServerAPI api) {
