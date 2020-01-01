@@ -1,6 +1,7 @@
 using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
 
@@ -70,7 +71,13 @@ namespace VSModLauncher.Items
 
         public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
         {
-            base.GetHeldItemInfo(inSlot, dsc.AppendLine("Imprisoned UID: " + inSlot.Itemstack.Attributes.GetString("pearled_uid", "Empty")), world, withDebugInfo);
+            ITreeAttribute attribs = inSlot?.Itemstack?.Attributes;
+            string imprisonedName = attribs?.GetString("pearled_name") ?? "Nobody";
+            string imprisonedUID = attribs?.GetString("pearled_uid") ?? "Empty";
+
+            dsc.AppendLine("Shackled: " + imprisonedName).AppendLine("UID: " + imprisonedUID);
+
+            base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
         }
     }
 }
