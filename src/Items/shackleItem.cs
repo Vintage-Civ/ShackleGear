@@ -44,7 +44,6 @@ namespace VSModLauncher.Items
                 if (byEntity.Controls.Sneak && attribs.GetString("pearled_uid") != null)
                 {
                     Prsn.FreePlayer(attribs.GetString("pearled_uid"), slot);
-                    ClearAttributes(attribs);
                 }
                 else
                 {
@@ -129,14 +128,6 @@ namespace VSModLauncher.Items
                 }
             }
             return base.UpdateAndGetTransitionStates(world, inSlot);
-        }
-
-        public void ClearAttributes(ITreeAttribute attribs)
-        {
-            foreach (var val in attribs)
-            {
-                attribs.RemoveAttribute(val.Key);
-            }
         }
     }
 }
