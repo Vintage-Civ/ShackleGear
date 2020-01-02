@@ -79,8 +79,10 @@
     <Compile Include="src\Listeners\DespawnListener.cs" />
     <Compile Include="src\Listeners\LogoutListener.cs" />
     <Compile Include="src\main.cs" />
-    <Compile Include="src\RedirectLogs.cs" />
     <Compile Include="src\Utility\Config.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\Gui\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

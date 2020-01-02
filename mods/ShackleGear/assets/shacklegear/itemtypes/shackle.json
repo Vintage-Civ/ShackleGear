@@ -9,11 +9,12 @@
     "shape": {
         "base": "game:item/gear-temporal"
     },
+    "attributes": {
+        "fuelmult": 8.0
+    },
+    "maxstacksize": 1,
     "textures": {
         "temporal": { "base": "item/shacklegear" }
-    },
-    "attributes": {
-        "test": 0
     },
     "glowLevel": 255,
     "guiTransform": {
