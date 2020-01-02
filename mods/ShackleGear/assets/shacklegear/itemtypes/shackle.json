@@ -11,7 +11,7 @@
     },
     "attributes": {
         "fuelmult": 472.65625,
-        "maxseconds": 1210000
+        "maxseconds": 1209600
     },
     "maxstacksize": 1,
     "textures": {
