@@ -10,7 +10,8 @@
         "base": "game:item/gear-temporal"
     },
     "attributes": {
-        "fuelmult": 8.0
+        "fuelmult": 472.65625,
+        "maxseconds": 1210000
     },
     "maxstacksize": 1,
     "textures": {

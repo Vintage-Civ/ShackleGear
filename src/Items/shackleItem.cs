@@ -13,24 +13,27 @@ namespace VSModLauncher.Items
     public class ItemShackleGear : Item
     {
         private ICoreServerAPI sapi;
-        private float fuelMult;
+        private double fuelMult;
+        private double maxSeconds;
         public PrisonController Prsn { get => sapi?.ModLoader.GetModSystem<ModSystemShackleGear>().Prsn; }
 
         public override void OnLoaded(ICoreAPI api)
         {
             base.OnLoaded(api);
             sapi = api as ICoreServerAPI;
-            fuelMult = Attributes["fuelmult"].AsFloat(1);
+            fuelMult = Attributes["fuelmult"].AsDouble(1);
+            maxSeconds = Attributes["maxseconds"].AsDouble(1210000);
         }
 
         public override void OnModifiedInInventorySlot(IWorldAccessor world, ItemSlot slot, ItemStack extractedStack = null)
         {
             base.OnModifiedInInventorySlot(world, slot, extractedStack);
-
+#if DEBUG
             if (world is IServerWorldAccessor)
             {
                 world.Logger.Debug("[SHACKLE-GEAR] Shackle Item Modified");
             }
+#endif
         }
 
         public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling)
@@ -52,8 +55,10 @@ namespace VSModLauncher.Items
                         if (s?.Itemstack?.Collectible?.CombustibleProps != null)
                         {
                             if (s.Itemstack.Collectible.CombustibleProps.BurnTemperature < 1000) return false;
-                            float currentfuel = attribs.GetFloat("pearled_fuel");
-                            attribs.SetFloat("pearled_fuel", currentfuel + (s.Itemstack.Collectible.CombustibleProps.BurnDuration * fuelMult));
+                            double currentfuel = attribs.GetDouble("pearled_fuel");
+                            if (currentfuel > maxSeconds) return true;
+
+                            attribs.SetDouble("pearled_fuel", currentfuel + (s.Itemstack.Collectible.CombustibleProps.BurnDuration * fuelMult));
                             s.TakeOut(1);
                             s.MarkDirty();
                             slot.MarkDirty();
@@ -98,9 +103,10 @@ namespace VSModLauncher.Items
             ITreeAttribute attribs = inSlot?.Itemstack?.Attributes;
             string imprisonedName = attribs?.GetString("pearled_name") ?? "Nobody";
             string imprisonedUID = attribs?.GetString("pearled_uid") ?? "Empty";
-            float fueledFor = (float)Math.Round(attribs?.GetFloat("pearled_fuel", 0) ?? 0.0f, 3);
+            double fueledFor = Math.Round(attribs?.GetDouble("pearled_fuel", 0) ?? 0.0f, 3);
+            TimeSpan time = TimeSpan.FromSeconds(fueledFor);
 
-            dsc.AppendLine("Shackled: " + imprisonedName).AppendLine("UID: " + imprisonedUID).AppendLine("ShackledTime: " + fueledFor + " Seconds");
+            dsc.AppendLine("Shackled: " + imprisonedName).AppendLine("UID: " + imprisonedUID).AppendLine("Remaining Time: " + time.ToString(@"dd\:hh\:mm\:ss"));
             
             base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
         }
@@ -114,20 +120,20 @@ namespace VSModLauncher.Items
                 {
                     if (attribs.GetDouble("pearled_timestamp", -1.0) != -1.0)
                     {
-                        float dt = (float)(world.Calendar.TotalHours - attribs.GetFloat("pearled_timestamp")) / 120;
-                        float fuel = attribs.GetFloat("pearled_fuel", 0.0f);
+                        double dt = (world.Calendar.TotalHours - attribs.GetFloat("pearled_timestamp")) / 60;
+                        double fuel = attribs.GetDouble("pearled_fuel", 0.0f);
                         if (fuel < 0f)
                         {
                             Prsn.FreePlayer(attribs.GetString("pearled_uid"), inSlot);
                         }
                         else
                         {
-                            attribs.SetFloat("pearled_fuel", fuel - dt);
+                            attribs.SetDouble("pearled_fuel", fuel - dt);
                         }
                     }
                 }
             }
-            return base.UpdateAndGetTransitionStates(world, inSlot);
+            return null;
         }
     }
 }

@@ -14,10 +14,11 @@ namespace VSModLauncher.Listeners
         {
             if (damagesource != null && damagesource.Source == EnumDamageSource.Entity)
             {
+#if DEBUG
                 sapi.Server.Logger.Debug(
                     "[SHACKLE-GEAR] DEATH EVENT FIRED BY " +
                     damagesource.SourceEntity.GetName());
-
+#endif
                 if (damagesource.SourceEntity is EntityPlayer)
                 {
                     IPlayer killer = sapi.World.PlayerByUid(((EntityPlayer)damagesource.SourceEntity).PlayerUID);
@@ -28,15 +29,27 @@ namespace VSModLauncher.Listeners
                         if (s?.Itemstack?.Item is ItemShackleGear && (s?.Itemstack.Attributes.GetString("pearled_uid") == null))
                         {
                             prsn.ImprisonPlayer(byplayer, s);
+#if DEBUG
                             sapi.Server.Logger.Debug("[SHACKLE-GEAR] Person pearled using Item: " + s.Itemstack.GetName() + "And Attr was " + s.Itemstack.Attributes.GetString("pearled_uid"));
+#endif
                             return true;
                         }
                         return false;
-                    })) sapi.Server.Logger.Debug("[SHACKLE-GEAR] No Empty pearl found");
+                    }))
+#if DEBUG
+                        api.Server.Logger.Debug("[SHACKLE-GEAR] No Empty pearl found")
+#endif
+#pragma warning disable CS0642
+                        ;
+#pragma warning restore CS0642
                 }
+#if DEBUG
                 else sapi.Server.Logger.Debug("[SHACKLE-GEAR] DEATH EVENT WAS NOT PLAYER");
+#endif
             }
+#if DEBUG
             else sapi.Server.Logger.Debug("[SHACKLE-GEAR] Playerkill but without player source");
+#endif
         }
 
         public DeathListener(ICoreServerAPI _api, PrisonController _prsn)
