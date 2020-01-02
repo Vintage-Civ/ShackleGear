@@ -15,9 +15,7 @@ namespace VSModLauncher.Listeners {
             {
                 foreach (var slot in inventory.Value)
                 {
-                    if (slot?.Itemstack?.Item == null) continue;
-
-                    if (slot.Itemstack.Item is ItemShackleGear && slot.Itemstack.Attributes.GetString("pearled_uid") != null)
+                    if (slot?.Itemstack?.Item is ItemShackleGear && slot.Itemstack.Attributes.GetString("pearled_uid") != null)
                     {
                         byplayer.Entity.World.Logger.Debug("[SHACKLE-GEAR] IDENTIFIED ITEM ON LOGOUT");
                         if (prsn.FreePlayer(slot.Itemstack.Attributes.GetString("pearled_uid"), slot))
