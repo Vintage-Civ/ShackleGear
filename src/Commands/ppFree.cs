@@ -2,6 +2,7 @@ using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Server;
 using VSModLauncher.Controllers;
+using VSModLauncher.Items;
 
 namespace VSModLauncher.Commands {
     public class ppFree
@@ -14,7 +15,7 @@ namespace VSModLauncher.Commands {
         }
         
         public void Handler(IServerPlayer player, int groupid, CmdArgs args) {
-            if (player.InventoryManager.ActiveHotbarSlot.Itemstack.GetName() == "Shackle-Gear")
+            if (player.InventoryManager.ActiveHotbarSlot?.Itemstack?.Item is ItemShackleGear)
             {
                 psrn.FreePlayer(player.InventoryManager.ActiveHotbarSlot.Itemstack.Attributes.GetString("pearled_uid"),
                     player.InventoryManager.ActiveHotbarSlot);

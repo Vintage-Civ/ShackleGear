@@ -1,11 +1,12 @@
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Server;
+using VSModLauncher.Items;
 
 namespace VSModLauncher.Commands {
     public class ppWho {
         public void Handler(IServerPlayer player, int groupid, CmdArgs args) {
-            if (player.InventoryManager.ActiveHotbarSlot.Itemstack.GetName() == "Shackle-Gear") {
+            if (player.InventoryManager.ActiveHotbarSlot?.Itemstack?.Item is ItemShackleGear) {
                 string heldplayer =
                     player.InventoryManager.ActiveHotbarSlot.Itemstack.Attributes.GetString(
                         "pearled_name");

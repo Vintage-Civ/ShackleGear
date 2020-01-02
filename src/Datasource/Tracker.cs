@@ -7,7 +7,6 @@ namespace VSModLauncher.Datasource
     public class Tracker
     {
         private static Tracker instance = null;
-        private PrisonController prsn = null;
         private List<TrackData> tracked;
 
         public static Tracker GetInstance()

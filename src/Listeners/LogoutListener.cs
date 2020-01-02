@@ -1,6 +1,7 @@
 using Vintagestory.API.Common;
 using Vintagestory.API.Server;
 using VSModLauncher.Controllers;
+using VSModLauncher.Items;
 
 namespace VSModLauncher.Listeners {
     public class LogoutListener
@@ -14,14 +15,12 @@ namespace VSModLauncher.Listeners {
             {
                 foreach (var slot in inventory.Value)
                 {
-                    //needs fixing, i shouldnt use the item name yikes
-                    if (slot.Itemstack.GetName() == "Shackle-Gear" && 
-                        slot.Itemstack.Attributes.GetString("pearled_uid") != null)
+                    if (slot?.Itemstack?.Item == null) continue;
+
+                    if (slot.Itemstack.Item is ItemShackleGear && slot.Itemstack.Attributes.GetString("pearled_uid") != null)
                     {
                         byplayer.Entity.World.Logger.Debug("[SHACKLE-GEAR] IDENTIFIED ITEM ON LOGOUT");
-                        bool Succeeded = prsn.FreePlayer(slot.Itemstack.Attributes.GetString("pearled_uid"), slot);
-
-                        if (Succeeded)
+                        if (prsn.FreePlayer(slot.Itemstack.Attributes.GetString("pearled_uid"), slot))
                         {
                             slot.TakeOutWhole();
                         }

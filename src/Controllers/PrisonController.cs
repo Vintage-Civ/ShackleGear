@@ -13,23 +13,18 @@ namespace VSModLauncher.Controllers
 
         public bool FreePlayer(string uid, ItemSlot shacklegear_slot, bool destroy = true)
         {
-
             sapi.Server.Logger.Debug("[SHACKLE-GEAR] Free Function Fired");
-            foreach (var serverPlayer in sapi.Server.Players)
+            IServerPlayer serverPlayer = sapi.World.PlayerByUid(uid) as IServerPlayer;
+            if (serverPlayer != null)
             {
-                if (serverPlayer.PlayerUID == uid)
-                {
-                    //do the things required to free a player.
-                    sapi.Permissions.SetRole(serverPlayer, "suplayer");
-                    ITreeAttribute attribs = shacklegear_slot.Itemstack.Attributes;
-                    serverPlayer.SpawnPosition.SetPos(GetSpawnFromAttributes(attribs));
+                sapi.Permissions.SetRole(serverPlayer, "suplayer");
+                ITreeAttribute attribs = shacklegear_slot.Itemstack.Attributes;
+                serverPlayer.SpawnPosition.SetPos(GetSpawnFromAttributes(attribs));
 
-                    serverPlayer.SendMessage(GlobalConstants.GeneralChatGroup, "You've been freed!", EnumChatType.Notification);
-                    if (destroy) shacklegear_slot.Itemstack.Item.Durability = 0;
-                    shacklegear_slot.MarkDirty();
-
-                    return true;
-                }
+                serverPlayer.SendMessage(GlobalConstants.GeneralChatGroup, "You've been freed!", EnumChatType.Notification);
+                if (destroy) shacklegear_slot.Itemstack.Item.Durability = 0;
+                shacklegear_slot.MarkDirty();
+                return true;
             }
             return false;
         }
