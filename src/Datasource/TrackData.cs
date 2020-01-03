@@ -7,6 +7,8 @@ namespace VSModLauncher.Datasource
     public class TrackData
     {
         public ItemStack Item;
+        public ItemSlot Slot;
+
         public IServerPlayer Prisoner;
         public IServerPlayer LastHolder;
         public int Last_x;
@@ -20,9 +22,9 @@ namespace VSModLauncher.Datasource
             this.Last_z = z;
         }
 
-        public TrackData(ItemStack _item, IServerPlayer _prisoner,IServerPlayer _lastHeldBy)
+        public TrackData(ItemSlot slot, IServerPlayer _prisoner,IServerPlayer _lastHeldBy)
         {
-            this.Item = _item;
+            this.Item = slot.Itemstack;
             this.Prisoner = _prisoner;
             this.LastHolder = _lastHeldBy;
         }

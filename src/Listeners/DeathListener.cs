@@ -28,7 +28,7 @@ namespace VSModLauncher.Listeners
                     {
                         if (s?.Itemstack?.Item is ItemShackleGear && (s?.Itemstack.Attributes.GetString("pearled_uid") == null))
                         {
-                            prsn.ImprisonPlayer(byplayer, s);
+                            prsn.ImprisonPlayer(byplayer, (IServerPlayer)killer, s);
 #if DEBUG
                             sapi.Server.Logger.Debug("[SHACKLE-GEAR] Person pearled using Item: " + s.Itemstack.GetName() + "And Attr was " + s.Itemstack.Attributes.GetString("pearled_uid"));
 #endif
@@ -37,7 +37,7 @@ namespace VSModLauncher.Listeners
                         return false;
                     }))
 #if DEBUG
-                        api.Server.Logger.Debug("[SHACKLE-GEAR] No Empty pearl found")
+                        sapi.Server.Logger.Debug("[SHACKLE-GEAR] No Empty pearl found")
 #endif
 #pragma warning disable CS0642
                         ;

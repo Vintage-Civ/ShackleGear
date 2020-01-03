@@ -7,6 +7,8 @@ using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
 using System.Linq;
 using VSModLauncher.Controllers;
+using VSModLauncher.Datasource;
+using System.Collections.Generic;
 
 namespace VSModLauncher.Items
 {
@@ -15,11 +17,14 @@ namespace VSModLauncher.Items
         private ICoreServerAPI sapi;
         private double fuelMult;
         private double maxSeconds;
-        public PrisonController Prsn { get => sapi?.ModLoader.GetModSystem<ModSystemShackleGear>().Prsn; }
+        public PrisonController Prsn { get => api.ModLoader.GetModSystem<ModSystemShackleGear>().Prsn; }
+        public ShackleGearTracker Tracker { get => api.ModLoader.GetModSystem<ShackleGearTracker>(); }
+        public List<TrackData> Tracked { get => Tracker.Tracked; }
 
         public override void OnLoaded(ICoreAPI api)
         {
             base.OnLoaded(api);
+
             sapi = api as ICoreServerAPI;
             fuelMult = Attributes["fuelmult"].AsDouble(1);
             maxSeconds = Attributes["maxseconds"].AsDouble(1210000);
@@ -113,7 +118,7 @@ namespace VSModLauncher.Items
 
         public override TransitionState[] UpdateAndGetTransitionStates(IWorldAccessor world, ItemSlot inSlot)
         {
-            if (world.Side.IsServer())
+            if (world.Side.IsServer() && !(inSlot is ItemSlotCreative))
             {
                 ITreeAttribute attribs = inSlot?.Itemstack?.Attributes;
                 if (attribs?.GetString("pearled_uid") != null)

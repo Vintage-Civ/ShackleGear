@@ -1,52 +1,68 @@
 using System.Collections.Generic;
+using Vintagestory.API.Common;
 using Vintagestory.API.Server;
 using VSModLauncher.Controllers;
+using System.Linq;
+using Vintagestory.API.Util;
 
 namespace VSModLauncher.Datasource
 {
-    public class Tracker
+    public class ShackleGearTracker : ModSystem
     {
-        private static Tracker instance = null;
-        private List<TrackData> tracked;
+        public List<TrackData> Tracked { get; set; }
 
-        public static Tracker GetInstance()
+        ICoreServerAPI sapi;
+
+        public override bool ShouldLoad(EnumAppSide forSide) => forSide == EnumAppSide.Server;
+
+        public override void StartServerSide(ICoreServerAPI api)
         {
-            return (instance == null) ? (instance = new Tracker()) : instance;
-        }
-        
-        public void InitTracker()
-        {
-            
+            sapi = api;
+            LoadTrackFromDB();
         }
 
         public void AddItemToTrack(TrackData item)
         {
-            tracked.Add(item);
+            Tracked.Add(item);
+            SaveTrackToDB();
         }
 
         public bool RemoveItemFromTrack(IServerPlayer prisoner)
         {
             bool removed_element = false;
-            foreach (var tracked_item in tracked)
+            foreach (var tracked_item in Tracked)
             {
                 if (tracked_item.Prisoner.PlayerUID == prisoner.PlayerUID)
                 {
-                    tracked.Remove(tracked_item);
+                    Tracked.Remove(tracked_item);
                     removed_element = true;
                 }
             }
+            SaveTrackToDB();
             return removed_element;
+        }
+
+        public void LoadTrackFromDB()
+        {
+            byte[] data = sapi.WorldManager.SaveGame.GetData("shacklegear_trackdata");
+            if (data == null)
+            {
+                Tracked = new List<TrackData>();
+                return;
+            }
+
+            Tracked = SerializerUtil.Deserialize<List<TrackData>>(sapi.WorldManager.SaveGame.GetData("shacklegear_trackdata"));
         }
 
         public void SaveTrackToDB()
         {
-            //Do something to save to db
+            sapi.WorldManager.SaveGame.StoreData("shacklegear_trackdata", SerializerUtil.Serialize(Tracked));
         }
 
 
-        public Tracker()
+        public ShackleGearTracker()
         {
-            tracked = new List<TrackData>();
+            Tracked = new List<TrackData>();
         }
     }
 }

@@ -4,6 +4,7 @@ using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
+using VSModLauncher.Datasource;
 
 namespace VSModLauncher.Controllers
 {
@@ -24,6 +25,9 @@ namespace VSModLauncher.Controllers
                 serverPlayer.SendMessage(GlobalConstants.GeneralChatGroup, "You've been freed!", EnumChatType.Notification);
                 if (destroy) shacklegear_slot.Itemstack.Item.Durability = 0;
                 shacklegear_slot.MarkDirty();
+
+                sapi.ModLoader.GetModSystem<ShackleGearTracker>().RemoveItemFromTrack(serverPlayer);
+
                 return true;
             }
             return false;
@@ -44,7 +48,7 @@ namespace VSModLauncher.Controllers
             return new Vec3d(attribs.GetDouble("pearled_x", 0), attribs.GetDouble("pearled_y", 0), attribs.GetDouble("pearled_z", 0));
         }
 
-        public void ImprisonPlayer(IServerPlayer player, ItemSlot shacklegear_slot)
+        public void ImprisonPlayer(IServerPlayer player, IServerPlayer killer, ItemSlot shacklegear_slot)
         {
             //imprison some player
             ITreeAttribute attribs = shacklegear_slot.Itemstack.Attributes;
@@ -56,6 +60,11 @@ namespace VSModLauncher.Controllers
 
             SetSpawnInAttributes(attribs, player);
             player.SpawnPosition.SetPos(player.Entity.ServerPos.XYZ);
+
+            if (!sapi.ModLoader.GetModSystem<ShackleGearTracker>().RemoveItemFromTrack(player))
+            {
+                sapi.ModLoader.GetModSystem<ShackleGearTracker>().AddItemToTrack(new TrackData(shacklegear_slot, player, killer));
+            }
 
             player.SendMessage(GlobalConstants.GeneralChatGroup, "You've been pearled!", EnumChatType.Notification);
 
