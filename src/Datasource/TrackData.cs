@@ -22,11 +22,11 @@ namespace VSModLauncher.Datasource
             this.Last_z = z;
         }
 
-        public TrackData(ItemSlot slot, IServerPlayer _prisoner,IServerPlayer _lastHeldBy)
+        public TrackData(ItemSlot slot, IServerPlayer prisoner, IServerPlayer lastHeldBy)
         {
             this.Item = slot.Itemstack;
-            this.Prisoner = _prisoner;
-            this.LastHolder = _lastHeldBy;
+            this.Prisoner = prisoner;
+            this.LastHolder = lastHeldBy;
         }
     }
 }

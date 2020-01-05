@@ -9,12 +9,14 @@ using System.Linq;
 using VSModLauncher.Controllers;
 using VSModLauncher.Datasource;
 using System.Collections.Generic;
+using Vintagestory.Client.NoObf;
 
 namespace VSModLauncher.Items
 {
     public class ItemShackleGear : Item
     {
         private ICoreServerAPI sapi;
+        private ICoreClientAPI capi;
         private double fuelMult;
         private double maxSeconds;
         public PrisonController Prsn { get => api.ModLoader.GetModSystem<ModSystemShackleGear>().Prsn; }
@@ -26,6 +28,8 @@ namespace VSModLauncher.Items
             base.OnLoaded(api);
 
             sapi = api as ICoreServerAPI;
+            capi = api as ICoreClientAPI;
+
             fuelMult = Attributes["fuelmult"].AsDouble(1);
             maxSeconds = Attributes["maxseconds"].AsDouble(1210000);
         }
@@ -74,33 +78,6 @@ namespace VSModLauncher.Items
                 }
             }
             base.OnHeldInteractStart(slot, byEntity, blockSel, entitySel, firstEvent, ref handling);
-        }
-
-        public override void InGuiIdle(IWorldAccessor world, ItemStack stack)
-        {
-            GuiTransform.Rotation.Y = GameMath.Mod(world.ElapsedMilliseconds / 50f, 360);
-        }
-
-        public override void OnHeldIdle(ItemSlot slot, EntityAgent byEntity)
-        {
-            if (byEntity.World is IClientWorldAccessor)
-            {
-                FpHandTransform.Rotation.Y = -GameMath.Mod(byEntity.World.ElapsedMilliseconds / 50f, 360);
-                TpHandTransform.Rotation.Y = -GameMath.Mod(byEntity.World.ElapsedMilliseconds / 50f, 360);
-            }
-        }
-
-        public override void OnGroundIdle(EntityItem entityItem)
-        {
-            GroundTransform.Rotation.Y = GameMath.Mod(entityItem.World.ElapsedMilliseconds / 50f, 360);
-
-            if (entityItem.World is IClientWorldAccessor)
-            {
-                float angle = (entityItem.World.ElapsedMilliseconds / 15f + entityItem.EntityId * 20) % 360;
-                float bobbing = entityItem.Collided ? GameMath.Sin(angle * GameMath.DEG2RAD) / 15 : 0;
-                Vec3d pos = entityItem.LocalPos.XYZ;
-                pos.Y += 0.15f + bobbing;
-            }
         }
 
         public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
