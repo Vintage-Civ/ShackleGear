@@ -12,15 +12,11 @@ namespace VSModLauncher.Datasource
 
         public IServerPlayer Prisoner;
         public IServerPlayer LastHolder;
-        public int Last_x;
-        public int Last_y;
-        public int Last_z;
+        public BlockPos lastPos = new BlockPos();
         
         public void SetLocation(int x, int y, int z)
         {
-            this.Last_x = x;
-            this.Last_y = y;
-            this.Last_z = z;
+            lastPos.X = x; lastPos.Y = y; lastPos.Z = z;
         }
 
         public void SetLocation(BlockPos pos)
