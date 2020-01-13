@@ -67,6 +67,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\BlockEntityBehaviors\PearlFinder.cs" />
     <Compile Include="src\Commands\ppDebug.cs" />
     <Compile Include="src\Commands\ppFree.cs" />
     <Compile Include="src\Commands\ppGetUID.cs" />

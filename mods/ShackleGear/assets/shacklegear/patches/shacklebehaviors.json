@@ -1,0 +1,22 @@
+[
+    {
+        "op": "add",
+        "path": "/server/behaviors/0",
+        "value": {
+            "code": "gearfinder"
+        },
+        "file": "game:entities/humanoid/player.json"
+    },
+    { 
+        "op": "add", "path": "/entityBehaviors", "value": [ { "name": "gearfinder" } ],
+        "file": "game:blocktypes/wood/generic/chest.json"
+    },
+    { 
+        "op": "add", "path": "/entityBehaviors", "value": [ { "name": "gearfinder" } ],
+        "file": "game:blocktypes/wood/generic/chest-labeled.json"
+    },
+    { 
+        "op": "add", "path": "/entityBehaviors", "value": [ { "name": "gearfinder" } ],
+        "file": "game:blocktypes/clay/storagevessel.json"
+    }
+]

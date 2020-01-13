@@ -4,12 +4,13 @@ using Vintagestory.API.Server;
 using VSModLauncher.Controllers;
 using System.Linq;
 using Vintagestory.API.Util;
+using Newtonsoft.Json;
 
 namespace VSModLauncher.Datasource
 {
     public class ShackleGearTracker : ModSystem
     {
-        public List<TrackData> Tracked { get; set; }
+        public List<TrackData> Tracked { get; set; } = new List<TrackData>();
 
         ICoreServerAPI sapi;
 
@@ -19,12 +20,25 @@ namespace VSModLauncher.Datasource
         {
             sapi = api;
             LoadTrackFromDB();
+            api.Event.ServerRunPhase(EnumServerRunPhase.Shutdown, () => SaveTrackToDB());
         }
 
         public void AddItemToTrack(TrackData item)
         {
             Tracked.Add(item);
             SaveTrackToDB();
+        }
+
+        public TrackData GetTrackData(string prisoneruid)
+        {
+            foreach (var val in Tracked)
+            {
+                if (val.Prisoner.PlayerUID == prisoneruid)
+                {
+                    return val;
+                }
+            }
+            return null;
         }
 
         public bool RemoveItemFromTrack(IServerPlayer prisoner)
@@ -45,18 +59,16 @@ namespace VSModLauncher.Datasource
         public void LoadTrackFromDB()
         {
             byte[] data = sapi.WorldManager.SaveGame.GetData("shacklegear_trackdata");
-            if (data == null)
+            if (data != null)
             {
-                Tracked = new List<TrackData>();
-                return;
+                Tracked = JsonUtil.FromBytes<List<TrackData>>(data);
             }
-
-            Tracked = SerializerUtil.Deserialize<List<TrackData>>(sapi.WorldManager.SaveGame.GetData("shacklegear_trackdata"));
+            else SaveTrackToDB();
         }
 
         public void SaveTrackToDB()
         {
-            sapi.WorldManager.SaveGame.StoreData("shacklegear_trackdata", SerializerUtil.Serialize(Tracked));
+            sapi.WorldManager.SaveGame.StoreData("shacklegear_trackdata", JsonUtil.ToBytes(Tracked));
         }
 
 

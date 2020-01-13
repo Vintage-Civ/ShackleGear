@@ -1,5 +1,6 @@
 using System;
 using Vintagestory.API.Common;
+using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
 
 namespace VSModLauncher.Datasource
@@ -20,6 +21,11 @@ namespace VSModLauncher.Datasource
             this.Last_x = x;
             this.Last_y = y;
             this.Last_z = z;
+        }
+
+        public void SetLocation(BlockPos pos)
+        {
+            SetLocation(pos.X, pos.Y, pos.Z);
         }
 
         public TrackData(ItemSlot slot, IServerPlayer prisoner, IServerPlayer lastHeldBy)

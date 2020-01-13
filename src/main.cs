@@ -1,5 +1,6 @@
 using Vintagestory.API.Common;
 using Vintagestory.API.Server;
+using VSModLauncher.BlockEntityBehaviors;
 using VSModLauncher.Controllers;
 using VSModLauncher.Items;
 using VSModLauncher.Listeners;
@@ -15,6 +16,8 @@ namespace VSModLauncher
             base.Start(api);
             //start both client and server side
             api.RegisterItemClass("shackleitem", typeof(ItemShackleGear));
+            api.RegisterBlockEntityBehaviorClass("gearfinder", typeof(BEBehaviorGearFinder));
+            api.RegisterEntityBehaviorClass("gearfinder", typeof(EntityBehaviorGearFinder));
         }
 
         public override void StartServerSide(ICoreServerAPI api)
