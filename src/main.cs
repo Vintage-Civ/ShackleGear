@@ -27,6 +27,7 @@ namespace VSModLauncher
             api.RegisterEntityBehaviorClass("gearfinder", typeof(EntityBehaviorGearFinder));
         }
 
+        long id;
         public override void StartServerSide(ICoreServerAPI api)
         {
             base.StartServerSide(api);
@@ -44,10 +45,16 @@ namespace VSModLauncher
 
             api.Event.PlayerJoin += player =>
             {
-                BlockPos pos = Tracker.GetTrackData(player.PlayerUID)?.lastPos;
+                TrackData data = Tracker.GetTrackData(player.PlayerUID);
+                BlockPos pos = data?.lastPos;
                 if (pos != null)
                 {
-                    //load chunk where last location gear was
+                    //update transition states until player is set free
+                    id = api.Event.RegisterGameTickListener(dt =>
+                    {
+                        if (data != null) (data.ItemStack.Item as ItemShackleGear)?.UpdateAndGetTransitionStates(api.World, data.Slot);
+                        else api.Event.UnregisterGameTickListener(id);
+                    }, 500);
                 }
             };
 

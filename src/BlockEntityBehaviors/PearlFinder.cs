@@ -40,7 +40,7 @@ namespace VSModLauncher.BlockEntityBehaviors
                             if (data != null)
                             {
                                 data.SetLocation(Pos);
-                                data.Item = a.Itemstack;
+                                data.ItemStack = a.Itemstack;
                             }
                         }
                     }
@@ -82,7 +82,7 @@ namespace VSModLauncher.BlockEntityBehaviors
                             if (data != null)
                             {
                                 data.SetLocation(Pos);
-                                data.Item = s.Itemstack;
+                                data.ItemStack = s.Itemstack;
                                 data.LastHolder = (entity.World as IServerWorldAccessor).PlayerByUid(((EntityPlayer)entity).PlayerUID) as IServerPlayer;
                             }
                         }   
