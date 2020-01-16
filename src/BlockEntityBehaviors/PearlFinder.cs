@@ -29,18 +29,18 @@ namespace VSModLauncher.BlockEntityBehaviors
 
             Blockentity.RegisterGameTickListener(dt =>
             {
-                (Blockentity as IBlockEntityContainer)?.Inventory.All(a =>
+                (Blockentity as IBlockEntityContainer)?.Inventory.All(slot =>
                 {
-                    if (a.Itemstack?.Item is ItemShackleGear)
+                    if (slot.Itemstack?.Item is ItemShackleGear)
                     {
-                        string uid = a.Itemstack.Attributes.GetString("pearled_uid");
+                        string uid = slot.Itemstack.Attributes.GetString("pearled_uid");
                         if (uid != null)
                         {
                             TrackData data = Tracker.GetTrackData(uid);
                             if (data != null)
                             {
                                 data.SetLocation(Pos);
-                                data.ItemStack = a.Itemstack;
+                                data.Slot = slot;
                             }
                         }
                     }
@@ -71,18 +71,18 @@ namespace VSModLauncher.BlockEntityBehaviors
 
             id = entity.World.RegisterGameTickListener(dt =>
             {
-                (entity as EntityPlayer).WalkInventory(s =>
+                (entity as EntityPlayer).WalkInventory(slot =>
                 {
-                    if (s.Itemstack?.Item is ItemShackleGear)
+                    if (slot.Itemstack?.Item is ItemShackleGear)
                     {
-                        string uid = s.Itemstack.Attributes.GetString("pearled_uid");
+                        string uid = slot.Itemstack.Attributes.GetString("pearled_uid");
                         if (uid != null)
                         {
                             TrackData data = Tracker.GetTrackData(uid);
                             if (data != null)
                             {
                                 data.SetLocation(Pos);
-                                data.ItemStack = s.Itemstack;
+                                data.Slot = slot;
                                 data.LastHolder = (entity.World as IServerWorldAccessor).PlayerByUid(((EntityPlayer)entity).PlayerUID) as IServerPlayer;
                             }
                         }   
