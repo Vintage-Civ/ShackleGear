@@ -1,0 +1,14 @@
+{
+    "ingredientPattern": "AGA,GTG,AGA",
+    "ingredients": {
+        "A": { "type": "item", "code": "game:ingot-gold" },
+        "G": { "type": "block", "code": "game:glass-plain" },
+        "T": { "type": "item", "code": "game:gear-temporal" }
+    },
+    "width": 3,
+    "height": 3,
+    "output": {
+        "type": "item",
+        "code": "shackle"
+    }
+}

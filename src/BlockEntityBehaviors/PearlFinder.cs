@@ -40,7 +40,8 @@ namespace VSModLauncher.BlockEntityBehaviors
                             if (data != null)
                             {
                                 data.SetLocation(Pos);
-                                data.Slot = slot;
+                                data.SlotReference.InventoryID = slot.Inventory.InventoryID;
+                                data.SlotReference.SlotID = slot.Inventory.GetSlotId(slot);
                             }
                         }
                     }
@@ -82,8 +83,9 @@ namespace VSModLauncher.BlockEntityBehaviors
                             if (data != null)
                             {
                                 data.SetLocation(Pos);
-                                data.Slot = slot;
-                                data.LastHolder = (entity.World as IServerWorldAccessor).PlayerByUid(((EntityPlayer)entity).PlayerUID) as IServerPlayer;
+                                data.SlotReference.InventoryID = slot.Inventory.InventoryID;
+                                data.SlotReference.SlotID = slot.Inventory.GetSlotId(slot);
+                                data.LastHolderUID = ((EntityPlayer)entity).PlayerUID;
                             }
                         }   
                     }

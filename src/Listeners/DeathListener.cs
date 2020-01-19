@@ -17,13 +17,12 @@ namespace VSModLauncher.Listeners
             {
                 sapi.World.Logger.Notification("[SHACKLEGEAR] Was EntityPlayer.");
                 IPlayer killer = sapi.World.PlayerByUid(((EntityPlayer)damagesource.SourceEntity).PlayerUID);
-                killer.Entity.WalkInventory(s =>
+                killer.Entity.WalkInventory(slot =>
                 {
-                    if (s?.Itemstack?.Item is ItemShackleGear && (s?.Itemstack.Attributes.GetString("pearled_uid") == null))
+                    if (slot?.Itemstack?.Item is ItemShackleGear && (slot?.Itemstack.Attributes.GetString("pearled_uid") == null))
                     {
-                        prsn.ImprisonPlayer(byplayer, (IServerPlayer)killer, s);
+                        prsn.ImprisonPlayer(byplayer, (IServerPlayer)killer, slot);
                         sapi.World.Logger.Notification("[SHACKLEGEAR] Gear Found.");
-                        return true;
                     }
                     return false;
                 });

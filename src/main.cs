@@ -52,8 +52,12 @@ namespace VSModLauncher
                     //update transition states until player is set free
                     id = api.Event.RegisterGameTickListener(dt =>
                     {
+                        bool wasunloaded = data.TryLoadChunk();
+
                         if (data != null) (data.ItemStack.Item as ItemShackleGear)?.UpdateAndGetTransitionStates(api.World, data.Slot);
                         else api.Event.UnregisterGameTickListener(id);
+
+                        if (wasunloaded) data.TryUnloadChunk();
                     }, 500);
                 }
             };

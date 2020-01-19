@@ -2,10 +2,10 @@
   "type": "code",
   "modid": "shacklegear",
   "name": "shacklegear",
-  "author": "Unknown",
-  "description": "To be added",
-  "version": "1.0.0",
+  "authors": [ "SimpleBastard", "Novocain" ],
+  "description": "Allows players to imprison other players with Shackle Gears.",
+  "version": "1.0.1",
   "dependency": {
-    "game": "1.10.9"
+    "game": "1.12.0-pre.9"
   }
 }
