@@ -50,11 +50,13 @@ namespace VSModLauncher
                 if (pos != null)
                 {
                     //update transition states until player is set free
+                    api.Permissions.SetRole(player, "suvisitor");
+
                     id = api.Event.RegisterGameTickListener(dt =>
                     {
                         bool wasunloaded = data.TryLoadChunk();
 
-                        if (data != null) (data.ItemStack.Item as ItemShackleGear)?.UpdateAndGetTransitionStates(api.World, data.Slot);
+                        if (data != null) (data.ItemStack.Item as ItemShackleGear)?.UpdateFuelState(api.World, data.Slot);
                         else api.Event.UnregisterGameTickListener(id);
 
                         if (wasunloaded) data.TryUnloadChunk();

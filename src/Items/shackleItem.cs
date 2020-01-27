@@ -93,7 +93,7 @@ namespace VSModLauncher.Items
             base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
         }
 
-        public override TransitionState[] UpdateAndGetTransitionStates(IWorldAccessor world, ItemSlot inSlot)
+        public void UpdateFuelState(IWorldAccessor world, ItemSlot inSlot)
         {
             if (world.Side.IsServer() && !(inSlot is ItemSlotCreative))
             {
@@ -107,6 +107,7 @@ namespace VSModLauncher.Items
                         if (fuel < 0f)
                         {
                             Prsn.FreePlayer(attribs.GetString("pearled_uid"), inSlot);
+                            attribs.SetDouble("pearled_timestamp", -1.0);
                         }
                         else
                         {
@@ -115,7 +116,6 @@ namespace VSModLauncher.Items
                     }
                 }
             }
-            return null;
         }
     }
 }

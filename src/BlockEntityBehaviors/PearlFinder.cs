@@ -33,6 +33,7 @@ namespace VSModLauncher.BlockEntityBehaviors
                 {
                     if (slot.Itemstack?.Item is ItemShackleGear)
                     {
+                        ((ItemShackleGear)slot.Itemstack.Item).UpdateFuelState(api.World, slot);
                         string uid = slot.Itemstack.Attributes.GetString("pearled_uid");
                         if (uid != null)
                         {
@@ -45,7 +46,7 @@ namespace VSModLauncher.BlockEntityBehaviors
                             }
                         }
                     }
-                    return false;
+                    return true;
                 });
                 Tracker.SaveTrackToDB();
             }, 500);
@@ -74,8 +75,9 @@ namespace VSModLauncher.BlockEntityBehaviors
             {
                 (entity as EntityPlayer).WalkInventory(slot =>
                 {
-                    if (slot.Itemstack?.Item is ItemShackleGear)
+                    if (!(slot is ItemSlotCreative) && slot.Itemstack?.Item is ItemShackleGear)
                     {
+                        ((ItemShackleGear)slot.Itemstack.Item).UpdateFuelState(entity.World, slot);
                         string uid = slot.Itemstack.Attributes.GetString("pearled_uid");
                         if (uid != null)
                         {
@@ -89,7 +91,7 @@ namespace VSModLauncher.BlockEntityBehaviors
                             }
                         }   
                     }
-                    return false;
+                    return true;
                 });
                 Tracker.SaveTrackToDB();
             }, 500);

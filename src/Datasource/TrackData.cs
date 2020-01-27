@@ -46,18 +46,20 @@ namespace VSModLauncher.Datasource
 
         public bool TryLoadChunk()
         {
-            var chunk = api.WorldManager.GetChunk(lastChunkPos.X, lastChunkPos.Y, lastChunkPos.Z);
-            bool wasdisposed = chunk.Disposed;
-            if (wasdisposed) api.WorldManager.LoadChunkColumnFast(lastChunkPos.X, lastChunkPos.Z);
-            return wasdisposed;
+            if (lastChunkPos == null) return false;
+
+            bool unloaded = api.WorldManager.GetChunk(lastChunkPos.X, lastChunkPos.Y, lastChunkPos.Z) == null;
+            if (unloaded) api.WorldManager.LoadChunkColumnFast(lastChunkPos.X, lastChunkPos.Z);
+            return unloaded;
         }
 
         public bool TryUnloadChunk()
         {
-            var chunk = api.WorldManager.GetChunk(lastChunkPos.X, lastChunkPos.Y, lastChunkPos.Z);
-            bool notdisposed = !chunk.Disposed;
-            if (notdisposed) api.WorldManager.UnloadChunkColumn(lastChunkPos.X, lastChunkPos.Z);
-            return notdisposed;
+            if (lastChunkPos == null) return false;
+
+            bool unloaded = api.WorldManager.GetChunk(lastChunkPos.X, lastChunkPos.Y, lastChunkPos.Z) == null;
+            if (!unloaded) api.WorldManager.UnloadChunkColumn(lastChunkPos.X, lastChunkPos.Z);
+            return unloaded;
         }
 
         public ItemStack ItemStack { get => Slot?.Itemstack; }
@@ -75,7 +77,7 @@ namespace VSModLauncher.Datasource
         [JsonProperty(ItemReferenceLoopHandling = ReferenceLoopHandling.Ignore)]
         public BlockPos lastPos = new BlockPos();
 
-        public Vec3i lastChunkPos { get => new Vec3i(lastPos.X / chunksize, lastPos.Y / chunksize, lastPos.Z / chunksize); }
+        public Vec3i lastChunkPos { get => new Vec3i(lastPos.X / chunksize, lastPos.Y / chunksize, lastPos.Z / chunksize) ?? null; }
 
         private int chunksize { get => api.World.BlockAccessor.ChunkSize;  }
         
