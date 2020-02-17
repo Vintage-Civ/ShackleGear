@@ -5,7 +5,7 @@ using VSModLauncher.Items;
 
 namespace VSModLauncher.Commands
 {
-    public class ppDebug
+    public class SGDebug
     {
         public void Handler(IServerPlayer player, int groupid, CmdArgs args)
         {

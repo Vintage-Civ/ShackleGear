@@ -67,27 +67,22 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\BlockEntityBehaviors\PearlFinder.cs" />
-    <Compile Include="src\Commands\ppDebug.cs" />
-    <Compile Include="src\Commands\ppFree.cs" />
-    <Compile Include="src\Commands\ppGetUID.cs" />
-    <Compile Include="src\Commands\ppLocate.cs" />
-    <Compile Include="src\Commands\ppWho.cs" />
-    <Compile Include="src\Commands\ppxFree.cs" />
-    <Compile Include="src\Commands\ppxPearl.cs" />
-    <Compile Include="src\Controllers\CommandCreator.cs" />
-    <Compile Include="src\Controllers\PrisonController.cs" />
-    <Compile Include="src\Datasource\TrackData.cs" />
-    <Compile Include="src\Datasource\Tracker.cs" />
-    <Compile Include="src\Items\shackleItem.cs" />
-    <Compile Include="src\Listeners\DeathListener.cs" />
-    <Compile Include="src\Listeners\DespawnListener.cs" />
-    <Compile Include="src\Listeners\LogoutListener.cs" />
-    <Compile Include="src\main.cs" />
+    <Compile Include="src\Systems\CommandRegistry.cs" />
+    <Compile Include="src\Systems\Commands\SGDebug.cs" />
+    <Compile Include="src\Systems\Commands\SGFree.cs" />
+    <Compile Include="src\Systems\Commands\SGGetUID.cs" />
+    <Compile Include="src\Systems\Commands\SGLocate.cs" />
+    <Compile Include="src\Systems\Commands\SGWho.cs" />
+    <Compile Include="src\Systems\Commands\SGXFree.cs" />
+    <Compile Include="src\Systems\Commands\SGXPearl.cs" />
+    <Compile Include="src\EntityBehaviors\EntityBehaviorGearFinder.cs" />
+    <Compile Include="src\BlockEntityBehaviors\BEBehaviorGearFinder..cs" />
+    <Compile Include="src\Systems\PrisonController.cs" />
+    <Compile Include="src\Systems\TrackData.cs" />
+    <Compile Include="src\Systems\Tracker.cs" />
+    <Compile Include="src\Items\ItemShackleGear.cs" />
+    <Compile Include="src\Systems\ModSystemShackleGear.cs" />
     <Compile Include="src\Utility\Config.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="src\Gui\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -19,27 +19,9 @@ namespace VSModLauncher.Datasource
         {
             get
             {
-                ItemSlot slot = null;
-
-                if (SlotReference.SlotID != -1)
-                {
-                    if (SlotReference.InventoryID != null)
-                    {
-                        slot = LastHolder?.InventoryManager?.Inventories?[SlotReference.InventoryID]?[SlotReference.SlotID];
-                    }
-
-
-                    if (!(slot?.Itemstack?.Item is ItemShackleGear) && slot?.Itemstack?.Attributes?.GetString("pearled_uid") != PrisonerUID)
-                    {
-                        slot = (api.World.BlockAccessor.GetBlockEntity(lastPos) as IBlockEntityContainer)?.Inventory[SlotReference.SlotID];
-
-                        if (!(slot?.Itemstack?.Item is ItemShackleGear) || slot?.Itemstack?.Attributes?.GetString("pearled_uid") != PrisonerUID)
-                        {
-                            slot = null;
-                        }
-                    }
-                }
-
+                bool wasunloaded = TryLoadChunk();
+                ItemSlot slot = LastHolder?.InventoryManager?.Inventories?[SlotReference.InventoryID]?[SlotReference.SlotID];
+                if (wasunloaded) api.Event.RegisterCallback(dt => TryUnloadChunk(), 500);
                 return slot;
             }
         }
@@ -49,7 +31,11 @@ namespace VSModLauncher.Datasource
             if (lastChunkPos == null) return false;
 
             bool unloaded = api.WorldManager.GetChunk(lastChunkPos.X, lastChunkPos.Y, lastChunkPos.Z) == null;
-            if (unloaded) api.WorldManager.LoadChunkColumnFast(lastChunkPos.X, lastChunkPos.Z);
+            if (unloaded)
+            {
+                api.WorldManager.LoadChunkColumnFast(lastChunkPos.X, lastChunkPos.Z);
+                api.World.Logger.Debug("[SHACKLE-GEAR] CHUNK LOADED " + lastChunkPos);
+            }
             return unloaded;
         }
 
@@ -58,7 +44,11 @@ namespace VSModLauncher.Datasource
             if (lastChunkPos == null) return false;
 
             bool unloaded = api.WorldManager.GetChunk(lastChunkPos.X, lastChunkPos.Y, lastChunkPos.Z) == null;
-            if (!unloaded) api.WorldManager.UnloadChunkColumn(lastChunkPos.X, lastChunkPos.Z);
+            if (!unloaded)
+            {
+                api.World.Logger.Debug("[SHACKLE-GEAR] CHUNK UNLOADED: " + lastChunkPos);
+                api.WorldManager.UnloadChunkColumn(lastChunkPos.X, lastChunkPos.Z);
+            }
             return unloaded;
         }
 

@@ -43,17 +43,21 @@ namespace VSModLauncher.Datasource
 
         public bool RemoveItemFromTrack(IServerPlayer prisoner)
         {
-            bool removed_element = false;
-            foreach (var tracked_item in Tracked)
+            bool found = false;
+            TrackData trackeditem = null;
+
+            foreach (var val in Tracked)
             {
-                if (tracked_item.Prisoner.PlayerUID == prisoner.PlayerUID)
+                if (val.Prisoner.PlayerUID == prisoner.PlayerUID)
                 {
-                    Tracked.Remove(tracked_item);
-                    removed_element = true;
+                    trackeditem = val;
+                    found = true;
+                    break;
                 }
             }
+            if (found) Tracked.Remove(trackeditem);
             SaveTrackToDB();
-            return removed_element;
+            return found;
         }
 
         public void LoadTrackFromDB()

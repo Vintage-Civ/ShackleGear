@@ -45,11 +45,21 @@ namespace VSModLauncher.Items
 #endif
         }
 
+        public override void OnGroundIdle(EntityItem entityItem)
+        {
+            base.OnGroundIdle(entityItem);
+            ITreeAttribute attribs = entityItem.Slot?.Itemstack?.Attributes;
+            if (attribs?.GetString("pearled_uid") != null)
+            {
+                Prsn.FreePlayer(attribs.GetString("pearled_uid"), entityItem.Slot);
+                entityItem.Die();
+            }
+        }
+
         public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling)
         {
             handling = EnumHandHandling.PreventDefault;
             ITreeAttribute attribs = slot?.Itemstack?.Attributes;
-
 
             if (sapi != null && attribs != null)
             {
@@ -95,6 +105,12 @@ namespace VSModLauncher.Items
 
         public void UpdateFuelState(IWorldAccessor world, ItemSlot inSlot)
         {
+            if (inSlot == null)
+            {
+                world.Logger.Debug("[SHACKLE-GEAR] Slot was null during update fuel state.");
+                return;
+            }
+
             if (world.Side.IsServer() && !(inSlot is ItemSlotCreative))
             {
                 ITreeAttribute attribs = inSlot?.Itemstack?.Attributes;

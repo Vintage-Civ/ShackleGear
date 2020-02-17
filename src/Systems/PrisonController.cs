@@ -23,7 +23,7 @@ namespace VSModLauncher.Controllers
                 serverPlayer.SpawnPosition.SetPos(GetSpawnFromAttributes(attribs));
 
                 serverPlayer.SendMessage(GlobalConstants.GeneralChatGroup, "You've been freed!", EnumChatType.Notification);
-                if (destroy) shacklegear_slot.Itemstack.Item.Durability = 0;
+                if (destroy) shacklegear_slot.TakeOutWhole();
                 shacklegear_slot.MarkDirty();
 
                 sapi.ModLoader.GetModSystem<ShackleGearTracker>().RemoveItemFromTrack(serverPlayer);
