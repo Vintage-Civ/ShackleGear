@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using Vintagestory.API.Common;
 using Vintagestory.API.Server;
-using VSModLauncher.Controllers;
+using ShackleGear.Controllers;
 using System.Linq;
 using Vintagestory.API.Util;
 using Newtonsoft.Json;
 
-namespace VSModLauncher.Datasource
+namespace ShackleGear.Datasource
 {
     public class ShackleGearTracker : ModSystem
     {

@@ -7,10 +7,10 @@ using Vintagestory.API;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
-using VSModLauncher.Datasource;
-using VSModLauncher.Items;
+using ShackleGear.Datasource;
+using ShackleGear.Items;
 
-namespace VSModLauncher.BlockEntityBehaviors
+namespace ShackleGear.BlockEntityBehaviors
 {
     class BEBehaviorGearFinder : BlockEntityBehavior
     {

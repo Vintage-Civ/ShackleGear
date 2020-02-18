@@ -1,9 +1,9 @@
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Server;
-using VSModLauncher.Items;
+using ShackleGear.Items;
 
-namespace VSModLauncher.Commands
+namespace ShackleGear.Commands
 {
     public class SGDebug
     {

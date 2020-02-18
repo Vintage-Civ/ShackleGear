@@ -67,7 +67,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\Systems\CommandRegistry.cs" />
+    <Compile Include="src\Systems\ClassRegistry.cs" />
     <Compile Include="src\Systems\Commands\SGDebug.cs" />
     <Compile Include="src\Systems\Commands\SGFree.cs" />
     <Compile Include="src\Systems\Commands\SGGetUID.cs" />

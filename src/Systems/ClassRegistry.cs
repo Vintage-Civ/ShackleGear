@@ -1,12 +1,22 @@
 using Vintagestory.API.Common;
 using Vintagestory.API.Server;
-using VSModLauncher.Commands;
+using ShackleGear.Commands;
+using ShackleGear.Items;
+using ShackleGear.BlockEntityBehaviors;
+using ShackleGear.EntityBehaviors;
 
-namespace VSModLauncher.Controllers
+namespace ShackleGear
 {
-    public class CommandRegistry : ModSystem
+    public partial class ModSystemShackleGear
     {
-        public override void StartServerSide(ICoreServerAPI api)
+        public void RegisterClasses(ICoreAPI api)
+        {
+            api.RegisterItemClass("shackleitem", typeof(ItemShackleGear));
+            api.RegisterBlockEntityBehaviorClass("gearfinder", typeof(BEBehaviorGearFinder));
+            api.RegisterEntityBehaviorClass("gearfinder", typeof(EntityBehaviorGearFinder));
+        }
+
+        public void RegisterServerCommands(ICoreServerAPI api)
         {
             api.RegisterCommand("sgfree", "Frees a shackled player if you're holding a shackle", "/sgfree", new SGFree(api).Handler);
             api.RegisterCommand("sggetuid", "Displays the PlayerUID for a given name", "/sggetuid name", new SGGetUID(api).Handler );

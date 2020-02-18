@@ -5,34 +5,34 @@ using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
-using VSModLauncher.BlockEntityBehaviors;
-using VSModLauncher.Controllers;
-using VSModLauncher.Datasource;
-using VSModLauncher.Items;
+using ShackleGear.BlockEntityBehaviors;
+using ShackleGear.Controllers;
+using ShackleGear.Datasource;
+using ShackleGear.Items;
+using ShackleGear.EntityBehaviors;
 
-namespace VSModLauncher
+namespace ShackleGear
 {
-    public class ModSystemShackleGear : ModSystem
+    public partial class ModSystemShackleGear : ModSystem
     {
-        public PrisonController Prsn { get; private set; }
-        ICoreAPI Api;
+        public PrisonController Prison { get; private set; }
+        ICoreAPI api;
         ICoreServerAPI sapi;
         Dictionary<string, long> TrackerIDs = new Dictionary<string, long>();
-        ShackleGearTracker Tracker { get => Api.ModLoader.GetModSystem<ShackleGearTracker>(); }
+        ShackleGearTracker Tracker { get => api.ModLoader.GetModSystem<ShackleGearTracker>(); }
 
         public override void Start(ICoreAPI api)
         {
-            Api = api;
-            api.RegisterItemClass("shackleitem", typeof(ItemShackleGear));
-            api.RegisterBlockEntityBehaviorClass("gearfinder", typeof(BEBehaviorGearFinder));
-            api.RegisterEntityBehaviorClass("gearfinder", typeof(EntityBehaviorGearFinder));
+            this.api = api;
+            RegisterClasses(api);
         }
 
         public override void StartServerSide(ICoreServerAPI api)
         {
             sapi = api;
 
-            Prsn = new PrisonController(api);
+            RegisterServerCommands(sapi);
+            Prison = new PrisonController(sapi);
 
             api.Event.PlayerDeath += OnPlayerDeath;
             api.Event.PlayerDisconnect += EventOnPlayerDisconnect;
@@ -60,10 +60,10 @@ namespace VSModLauncher
                     {
                         bool wasunloaded = false;
 
-                        if (data != null)
+                        if (data?.ItemStack?.Item as ItemShackleGear != null)
                         {
                             wasunloaded = data.TryLoadChunk();
-                            (data.ItemStack.Item as ItemShackleGear)?.UpdateFuelState(sapi.World, data.Slot);
+                            ((ItemShackleGear)data.ItemStack.Item).UpdateFuelState(sapi.World, data.Slot);
                         }
                         else sapi.Event.UnregisterGameTickListener(TrackerIDs[uid]);
 
@@ -71,7 +71,9 @@ namespace VSModLauncher
                     }
                     catch (Exception ex)
                     {
+#if DEBUG
                         sapi.World.Logger.Debug("[ShackleGear] Exception thrown: " + ex);
+#endif
                         sapi.Event.UnregisterGameTickListener(TrackerIDs[uid]);
                     }
 
@@ -81,17 +83,23 @@ namespace VSModLauncher
 
         public void OnPlayerDeath(IServerPlayer byplayer, DamageSource damagesource)
         {
+#if DEBUG
             sapi.World.Logger.Notification("[SHACKLEGEAR] Event Fired.");
+#endif
             if (damagesource?.SourceEntity is EntityPlayer)
             {
+#if DEBUG
                 sapi.World.Logger.Notification("[SHACKLEGEAR] Was EntityPlayer.");
+#endif
                 IPlayer killer = sapi.World.PlayerByUid(((EntityPlayer)damagesource.SourceEntity).PlayerUID);
                 killer.Entity.WalkInventory(slot =>
                 {
                     if (slot?.Itemstack?.Item is ItemShackleGear && (slot?.Itemstack.Attributes.GetString("pearled_uid") == null))
                     {
-                        Prsn.ImprisonPlayer(byplayer, (IServerPlayer)killer, slot);
+                        Prison.ImprisonPlayer(byplayer, (IServerPlayer)killer, slot);
+#if DEBUG
                         sapi.World.Logger.Notification("[SHACKLEGEAR] Gear Found.");
+#endif
                         return false;
                     }
                     return true;

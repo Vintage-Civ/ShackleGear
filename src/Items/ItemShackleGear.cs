@@ -6,12 +6,12 @@ using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
 using System.Linq;
-using VSModLauncher.Controllers;
-using VSModLauncher.Datasource;
+using ShackleGear.Controllers;
+using ShackleGear.Datasource;
 using System.Collections.Generic;
 using Vintagestory.Client.NoObf;
 
-namespace VSModLauncher.Items
+namespace ShackleGear.Items
 {
     public class ItemShackleGear : Item
     {
@@ -19,7 +19,7 @@ namespace VSModLauncher.Items
         private ICoreClientAPI capi;
         private double fuelMult;
         private double maxSeconds;
-        public PrisonController Prsn { get => api.ModLoader.GetModSystem<ModSystemShackleGear>().Prsn; }
+        public PrisonController Prsn { get => api.ModLoader.GetModSystem<ModSystemShackleGear>().Prison; }
         public ShackleGearTracker Tracker { get => api.ModLoader.GetModSystem<ShackleGearTracker>(); }
         public List<TrackData> Tracked { get => Tracker.Tracked; }
 
@@ -107,7 +107,9 @@ namespace VSModLauncher.Items
         {
             if (inSlot == null)
             {
+#if DEBUG
                 world.Logger.Debug("[SHACKLE-GEAR] Slot was null during update fuel state.");
+#endif
                 return;
             }
 
@@ -131,6 +133,7 @@ namespace VSModLauncher.Items
                         }
                     }
                 }
+                inSlot.MarkDirty();
             }
         }
     }

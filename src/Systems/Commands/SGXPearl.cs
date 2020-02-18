@@ -2,7 +2,7 @@ using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Server;
 
-namespace VSModLauncher.Commands
+namespace ShackleGear.Commands
 {
     public class SGXPearl
     {

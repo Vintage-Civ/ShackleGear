@@ -1,10 +1,10 @@
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Server;
-using VSModLauncher.Controllers;
-using VSModLauncher.Items;
+using ShackleGear.Controllers;
+using ShackleGear.Items;
 
-namespace VSModLauncher.Commands {
+namespace ShackleGear.Commands {
     public class SGFree
     {
         public ICoreServerAPI sapi;
@@ -14,7 +14,7 @@ namespace VSModLauncher.Commands {
             this.sapi = sapi;
         }
 
-        private PrisonController prsn { get => sapi.ModLoader.GetModSystem<ModSystemShackleGear>().Prsn;  }
+        private PrisonController prsn { get => sapi.ModLoader.GetModSystem<ModSystemShackleGear>().Prison;  }
         
         public void Handler(IServerPlayer player, int groupid, CmdArgs args) {
             if (player.InventoryManager.ActiveHotbarSlot?.Itemstack?.Item is ItemShackleGear)

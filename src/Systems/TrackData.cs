@@ -3,9 +3,9 @@ using System;
 using Vintagestory.API.Common;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
-using VSModLauncher.Items;
+using ShackleGear.Items;
 
-namespace VSModLauncher.Datasource
+namespace ShackleGear.Datasource
 {
     public class FullTrackData
     {
@@ -34,7 +34,7 @@ namespace VSModLauncher.Datasource
                 bool wasunloaded = TryLoadChunk();
                 if (LastHolder?.InventoryManager?.Inventories != null && LastHolder.InventoryManager.Inventories.ContainsKey(trackData.SlotReference.InventoryID))
                 {
-                    slot = LastHolder.InventoryManager.Inventories[trackData.SlotReference.InventoryID]?[trackData.SlotReference.SlotID];
+                    slot = LastHolder.InventoryManager.Inventories[trackData.SlotReference.InventoryID][trackData.SlotReference.SlotID];
                 }
                 else
                 {
@@ -53,8 +53,10 @@ namespace VSModLauncher.Datasource
             IsChunkLoaded = api.WorldManager.GetChunk(LastChunkPos.X, LastChunkPos.Y, LastChunkPos.Z) != null;
             if (!IsChunkLoaded)
             {
-                api.WorldManager.LoadChunkColumnFast(LastChunkPos.X, LastChunkPos.Z, new ChunkLoadOptions() { KeepLoaded = true, OnLoaded = () => IsChunkLoaded = true });
+                api.WorldManager.LoadChunkColumnFast(LastChunkPos.X, LastChunkPos.Z, new ChunkLoadOptions() { KeepLoaded = true });
+#if DEBUG
                 api.World.Logger.Debug("[SHACKLE-GEAR] CHUNK LOADING: " + LastChunkPos);
+#endif
             }
             return !IsChunkLoaded;
         }
@@ -66,8 +68,10 @@ namespace VSModLauncher.Datasource
             IsChunkLoaded = api.WorldManager.GetChunk(LastChunkPos.X, LastChunkPos.Y, LastChunkPos.Z) != null;
             if (IsChunkLoaded)
             {
-                api.World.Logger.Debug("[SHACKLE-GEAR] CHUNK UNLOADING: " + LastChunkPos);
                 api.WorldManager.UnloadChunkColumn(LastChunkPos.X, LastChunkPos.Z);
+#if DEBUG
+                api.World.Logger.Debug("[SHACKLE-GEAR] CHUNK UNLOADING: " + LastChunkPos);
+#endif
                 IsChunkLoaded = false;
             }
             return !IsChunkLoaded;
@@ -89,7 +93,7 @@ namespace VSModLauncher.Datasource
         public SlotReference SlotReference { get; set; }
 
         [JsonProperty(ItemReferenceLoopHandling = ReferenceLoopHandling.Ignore)]
-        public BlockPos LastPos { get; set; } = new BlockPos();
+        public BlockPos LastPos { get; set; }
 
         [JsonProperty(ItemReferenceLoopHandling = ReferenceLoopHandling.Ignore)]
         public string PrisonerUID { get; set; }

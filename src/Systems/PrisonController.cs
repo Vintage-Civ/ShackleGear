@@ -4,27 +4,34 @@ using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
-using VSModLauncher.Datasource;
+using ShackleGear.Datasource;
 
-namespace VSModLauncher.Controllers
+namespace ShackleGear.Controllers
 {
     public class PrisonController
     {
         private ICoreServerAPI sapi;
 
-        public bool FreePlayer(string uid, ItemSlot shacklegear_slot, bool destroy = true)
+        public PrisonController(ICoreServerAPI sapi)
         {
+            this.sapi = sapi;
+        }
+
+        public bool FreePlayer(string uid, ItemSlot slot, bool destroy = true)
+        {
+#if DEBUG
             sapi.Server.Logger.Debug("[SHACKLE-GEAR] Free Function Fired");
+#endif
             IServerPlayer serverPlayer = sapi.World.PlayerByUid(uid) as IServerPlayer;
             if (serverPlayer != null)
             {
                 sapi.Permissions.SetRole(serverPlayer, "suplayer");
-                ITreeAttribute attribs = shacklegear_slot.Itemstack.Attributes;
+                ITreeAttribute attribs = slot.Itemstack.Attributes;
                 serverPlayer.SpawnPosition.SetPos(GetSpawnFromAttributes(attribs));
 
                 serverPlayer.SendMessage(GlobalConstants.GeneralChatGroup, "You've been freed!", EnumChatType.Notification);
-                if (destroy) shacklegear_slot.TakeOutWhole();
-                shacklegear_slot.MarkDirty();
+                if (destroy) slot.TakeOutWhole();
+                slot.MarkDirty();
 
                 sapi.ModLoader.GetModSystem<ShackleGearTracker>().RemoveItemFromTrack(serverPlayer);
 
@@ -48,11 +55,13 @@ namespace VSModLauncher.Controllers
             return new Vec3d(attribs.GetDouble("pearled_x", 0), attribs.GetDouble("pearled_y", 0), attribs.GetDouble("pearled_z", 0));
         }
 
-        public void ImprisonPlayer(IServerPlayer prisoner, IServerPlayer killer, ItemSlot shacklegear_slot)
+        public void ImprisonPlayer(IServerPlayer prisoner, IServerPlayer killer, ItemSlot slot)
         {
             //imprison some player
-            ITreeAttribute attribs = shacklegear_slot.Itemstack.Attributes;
+            ITreeAttribute attribs = slot.Itemstack.Attributes;
+#if DEBUG
             sapi.Server.Logger.Debug("[SHACKLE-GEAR] Imprison Function Fired");
+#endif
             attribs.SetString("pearled_uid", prisoner.PlayerUID);
             attribs.SetString("pearled_name", prisoner.PlayerName);
             attribs.SetDouble("pearled_timestamp", sapi.World.Calendar.TotalHours);
@@ -62,13 +71,13 @@ namespace VSModLauncher.Controllers
 
             if (!sapi.ModLoader.GetModSystem<ShackleGearTracker>().RemoveItemFromTrack(prisoner))
             {
-                sapi.ModLoader.GetModSystem<ShackleGearTracker>().AddItemToTrack(new TrackData(GenSlotReference(shacklegear_slot), killer.Entity.ServerPos.AsBlockPos, prisoner.PlayerUID, killer.PlayerUID));
+                sapi.ModLoader.GetModSystem<ShackleGearTracker>().AddItemToTrack(new TrackData(GenSlotReference(slot), killer.Entity.ServerPos.AsBlockPos, prisoner.PlayerUID, killer.PlayerUID));
             }
 
-            sapi.ModLoader.GetModSystem<ModSystemShackleGear>().RegisterPearlUpdate(prisoner);
+            sapi.ModLoader.GetModSystem<ShackleGear.ModSystemShackleGear>().RegisterPearlUpdate(prisoner);
             prisoner.SendMessage(GlobalConstants.GeneralChatGroup, "You've been shackled!", EnumChatType.Notification);
 
-            shacklegear_slot.MarkDirty();
+            slot.MarkDirty();
         }
 
         public SlotReference GenSlotReference(ItemSlot slot)
@@ -76,9 +85,5 @@ namespace VSModLauncher.Controllers
             return new SlotReference(slot.Inventory.GetSlotId(slot), slot.Inventory.InventoryID);
         }
 
-        public PrisonController(ICoreServerAPI _api)
-        {
-            sapi = _api;
-        }
     }
 }

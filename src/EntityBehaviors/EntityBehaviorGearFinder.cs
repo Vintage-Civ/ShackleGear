@@ -2,10 +2,10 @@
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.MathTools;
-using VSModLauncher.Datasource;
-using VSModLauncher.Items;
+using ShackleGear.Datasource;
+using ShackleGear.Items;
 
-namespace VSModLauncher.BlockEntityBehaviors
+namespace ShackleGear.EntityBehaviors
 {
     class EntityBehaviorGearFinder : EntityBehavior
     {
