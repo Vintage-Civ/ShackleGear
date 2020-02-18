@@ -7,20 +7,40 @@ using VSModLauncher.Items;
 
 namespace VSModLauncher.Datasource
 {
-    [JsonObject(MemberSerialization.OptIn, ItemReferenceLoopHandling = ReferenceLoopHandling.Ignore)]
-    public class TrackData
+    public class FullTrackData
     {
-        ICoreServerAPI api;
+        public FullTrackData(TrackData trackData, ICoreServerAPI api)
+        {
+            this.trackData = trackData;
+            this.api = api;
+        }
 
-        [JsonProperty(ItemReferenceLoopHandling = ReferenceLoopHandling.Ignore)]
-        public SlotReference SlotReference;
+        public TrackData trackData;
+        private ICoreServerAPI api;
+
+        public ItemStack ItemStack { get => Slot?.Itemstack; }
+        public IServerPlayer Prisoner { get => (IServerPlayer)api.World.PlayerByUid(trackData.PrisonerUID); }
+        public IServerPlayer LastHolder { get => (IServerPlayer)api.World.PlayerByUid(trackData.LastHolderUID); }
+        public Vec3i LastChunkPos { get => new Vec3i(trackData.LastPos.X / Chunksize, trackData.LastPos.Y / Chunksize, trackData.LastPos.Z / Chunksize) ?? null; }
+        private int Chunksize { get => api.World.BlockAccessor.ChunkSize; }
+        public bool IsChunkLoaded { get; private set; }
 
         public ItemSlot Slot
         {
             get
             {
+                ItemSlot slot = null;
+
                 bool wasunloaded = TryLoadChunk();
-                ItemSlot slot = LastHolder?.InventoryManager?.Inventories?[SlotReference.InventoryID]?[SlotReference.SlotID];
+                if (LastHolder?.InventoryManager?.Inventories != null && LastHolder.InventoryManager.Inventories.ContainsKey(trackData.SlotReference.InventoryID))
+                {
+                    slot = LastHolder.InventoryManager.Inventories[trackData.SlotReference.InventoryID]?[trackData.SlotReference.SlotID];
+                }
+                else
+                {
+                    slot = (api.World.BlockAccessor.GetBlockEntity(trackData.LastPos) as IBlockEntityContainer)?.Inventory?[trackData.SlotReference.SlotID];
+                }
+                
                 if (wasunloaded) api.Event.RegisterCallback(dt => TryUnloadChunk(), 500);
                 return slot;
             }
@@ -28,66 +48,63 @@ namespace VSModLauncher.Datasource
 
         public bool TryLoadChunk()
         {
-            if (lastChunkPos == null) return false;
+            if (LastChunkPos == null) return false;
 
-            bool unloaded = api.WorldManager.GetChunk(lastChunkPos.X, lastChunkPos.Y, lastChunkPos.Z) == null;
-            if (unloaded)
+            IsChunkLoaded = api.WorldManager.GetChunk(LastChunkPos.X, LastChunkPos.Y, LastChunkPos.Z) != null;
+            if (!IsChunkLoaded)
             {
-                api.WorldManager.LoadChunkColumnFast(lastChunkPos.X, lastChunkPos.Z);
-                api.World.Logger.Debug("[SHACKLE-GEAR] CHUNK LOADED " + lastChunkPos);
+                api.WorldManager.LoadChunkColumnFast(LastChunkPos.X, LastChunkPos.Z, new ChunkLoadOptions() { KeepLoaded = true, OnLoaded = () => IsChunkLoaded = true });
+                api.World.Logger.Debug("[SHACKLE-GEAR] CHUNK LOADING: " + LastChunkPos);
             }
-            return unloaded;
+            return !IsChunkLoaded;
         }
 
         public bool TryUnloadChunk()
         {
-            if (lastChunkPos == null) return false;
+            if (LastChunkPos == null) return false;
 
-            bool unloaded = api.WorldManager.GetChunk(lastChunkPos.X, lastChunkPos.Y, lastChunkPos.Z) == null;
-            if (!unloaded)
+            IsChunkLoaded = api.WorldManager.GetChunk(LastChunkPos.X, LastChunkPos.Y, LastChunkPos.Z) != null;
+            if (IsChunkLoaded)
             {
-                api.World.Logger.Debug("[SHACKLE-GEAR] CHUNK UNLOADED: " + lastChunkPos);
-                api.WorldManager.UnloadChunkColumn(lastChunkPos.X, lastChunkPos.Z);
+                api.World.Logger.Debug("[SHACKLE-GEAR] CHUNK UNLOADING: " + LastChunkPos);
+                api.WorldManager.UnloadChunkColumn(LastChunkPos.X, LastChunkPos.Z);
+                IsChunkLoaded = false;
             }
-            return unloaded;
+            return !IsChunkLoaded;
+        }
+    }
+
+    [JsonObject(MemberSerialization.OptIn, ItemReferenceLoopHandling = ReferenceLoopHandling.Ignore)]
+    public class TrackData
+    {
+        public TrackData(SlotReference slotReference, BlockPos lastPos, string prisonerUID, string lastHolderUID)
+        {
+            SlotReference = slotReference;
+            LastPos = lastPos;
+            PrisonerUID = prisonerUID;
+            LastHolderUID = lastHolderUID;
         }
 
-        public ItemStack ItemStack { get => Slot?.Itemstack; }
+        [JsonProperty(ItemReferenceLoopHandling = ReferenceLoopHandling.Ignore)]
+        public SlotReference SlotReference { get; set; }
 
         [JsonProperty(ItemReferenceLoopHandling = ReferenceLoopHandling.Ignore)]
-        public string PrisonerUID;
+        public BlockPos LastPos { get; set; } = new BlockPos();
 
         [JsonProperty(ItemReferenceLoopHandling = ReferenceLoopHandling.Ignore)]
-        public string LastHolderUID;
-
-        public IServerPlayer Prisoner { get => (IServerPlayer)api.World.PlayerByUid(PrisonerUID); }
-        public IServerPlayer LastHolder { get => (IServerPlayer)api.World.PlayerByUid(LastHolderUID); }
-
+        public string PrisonerUID { get; set; }
 
         [JsonProperty(ItemReferenceLoopHandling = ReferenceLoopHandling.Ignore)]
-        public BlockPos lastPos = new BlockPos();
-
-        public Vec3i lastChunkPos { get => new Vec3i(lastPos.X / chunksize, lastPos.Y / chunksize, lastPos.Z / chunksize) ?? null; }
-
-        private int chunksize { get => api.World.BlockAccessor.ChunkSize;  }
+        public string LastHolderUID { get; set; }
         
         public void SetLocation(int x, int y, int z)
         {
-            lastPos.X = x; lastPos.Y = y; lastPos.Z = z;
+            LastPos.X = x; LastPos.Y = y; LastPos.Z = z;
         }
 
         public void SetLocation(BlockPos pos)
         {
             SetLocation(pos.X, pos.Y, pos.Z);
-        }
-
-        public TrackData(ItemSlot slot, IServerPlayer prisoner, IServerPlayer lastHeldBy)
-        {
-            SlotReference = new SlotReference(slot.Inventory.GetSlotId(slot), slot.Inventory.InventoryID);
-
-            api = lastHeldBy.Entity.World.Api as ICoreServerAPI;
-            PrisonerUID = prisoner.PlayerUID;
-            LastHolderUID = lastHeldBy.PlayerUID;
         }
     }
 

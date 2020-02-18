@@ -48,27 +48,32 @@ namespace VSModLauncher.Controllers
             return new Vec3d(attribs.GetDouble("pearled_x", 0), attribs.GetDouble("pearled_y", 0), attribs.GetDouble("pearled_z", 0));
         }
 
-        public void ImprisonPlayer(IServerPlayer player, IServerPlayer killer, ItemSlot shacklegear_slot)
+        public void ImprisonPlayer(IServerPlayer prisoner, IServerPlayer killer, ItemSlot shacklegear_slot)
         {
             //imprison some player
             ITreeAttribute attribs = shacklegear_slot.Itemstack.Attributes;
             sapi.Server.Logger.Debug("[SHACKLE-GEAR] Imprison Function Fired");
-            sapi.Permissions.SetRole(player, "suvisitor");
-            attribs.SetString("pearled_uid", player.PlayerUID);
-            attribs.SetString("pearled_name", player.PlayerName);
+            attribs.SetString("pearled_uid", prisoner.PlayerUID);
+            attribs.SetString("pearled_name", prisoner.PlayerName);
             attribs.SetDouble("pearled_timestamp", sapi.World.Calendar.TotalHours);
 
-            SetSpawnInAttributes(attribs, player);
-            player.SpawnPosition.SetPos(player.Entity.ServerPos.XYZ);
+            SetSpawnInAttributes(attribs, prisoner);
+            prisoner.SpawnPosition.SetPos(prisoner.Entity.ServerPos.XYZ);
 
-            if (!sapi.ModLoader.GetModSystem<ShackleGearTracker>().RemoveItemFromTrack(player))
+            if (!sapi.ModLoader.GetModSystem<ShackleGearTracker>().RemoveItemFromTrack(prisoner))
             {
-                sapi.ModLoader.GetModSystem<ShackleGearTracker>().AddItemToTrack(new TrackData(shacklegear_slot, player, killer));
+                sapi.ModLoader.GetModSystem<ShackleGearTracker>().AddItemToTrack(new TrackData(GenSlotReference(shacklegear_slot), killer.Entity.ServerPos.AsBlockPos, prisoner.PlayerUID, killer.PlayerUID));
             }
 
-            player.SendMessage(GlobalConstants.GeneralChatGroup, "You've been pearled!", EnumChatType.Notification);
+            sapi.ModLoader.GetModSystem<ModSystemShackleGear>().RegisterPearlUpdate(prisoner);
+            prisoner.SendMessage(GlobalConstants.GeneralChatGroup, "You've been shackled!", EnumChatType.Notification);
 
             shacklegear_slot.MarkDirty();
+        }
+
+        public SlotReference GenSlotReference(ItemSlot slot)
+        {
+            return new SlotReference(slot.Inventory.GetSlotId(slot), slot.Inventory.InventoryID);
         }
 
         public PrisonController(ICoreServerAPI _api)

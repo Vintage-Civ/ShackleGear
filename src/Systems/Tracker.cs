@@ -10,6 +10,7 @@ namespace VSModLauncher.Datasource
 {
     public class ShackleGearTracker : ModSystem
     {
+        public List<FullTrackData> FullTracked { get; set; } = new List<FullTrackData>();
         public List<TrackData> Tracked { get; set; } = new List<TrackData>();
 
         ICoreServerAPI sapi;
@@ -26,14 +27,16 @@ namespace VSModLauncher.Datasource
         public void AddItemToTrack(TrackData item)
         {
             Tracked.Add(item);
+            FullTracked.Add(new FullTrackData(item, sapi));
+
             SaveTrackToDB();
         }
 
-        public TrackData GetTrackData(string prisoneruid)
+        public FullTrackData GetTrackData(string prisoneruid)
         {
-            foreach (var val in Tracked)
+            foreach (var val in FullTracked)
             {
-                if (val.Prisoner.PlayerUID == prisoneruid)
+                if (val.trackData?.PrisonerUID == prisoneruid)
                 {
                     return val;
                 }
@@ -45,10 +48,11 @@ namespace VSModLauncher.Datasource
         {
             bool found = false;
             TrackData trackeditem = null;
+            FullTrackData fulltrackeditem = null;
 
             foreach (var val in Tracked)
             {
-                if (val.Prisoner.PlayerUID == prisoner.PlayerUID)
+                if (val.PrisonerUID == prisoner.PlayerUID)
                 {
                     trackeditem = val;
                     found = true;
@@ -56,6 +60,19 @@ namespace VSModLauncher.Datasource
                 }
             }
             if (found) Tracked.Remove(trackeditem);
+            found = false;
+
+            foreach (var val in FullTracked)
+            {
+                if (val.trackData?.PrisonerUID == null || val.trackData?.PrisonerUID == prisoner.PlayerUID)
+                {
+                    fulltrackeditem = val;
+                    found = true;
+                    break;
+                }
+            }
+            if (found) FullTracked.Remove(fulltrackeditem);
+
             SaveTrackToDB();
             return found;
         }
@@ -66,6 +83,10 @@ namespace VSModLauncher.Datasource
             if (data != null)
             {
                 Tracked = JsonUtil.FromBytes<List<TrackData>>(data);
+                foreach (var val in Tracked)
+                {
+                    FullTracked.Add(new FullTrackData(val, sapi));
+                }
             }
             else SaveTrackToDB();
         }
@@ -73,12 +94,6 @@ namespace VSModLauncher.Datasource
         public void SaveTrackToDB()
         {
             sapi.WorldManager.SaveGame.StoreData("shacklegear_trackdata", JsonUtil.ToBytes(Tracked));
-        }
-
-
-        public ShackleGearTracker()
-        {
-            Tracked = new List<TrackData>();
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Vintagestory.API.Common;
@@ -39,30 +40,41 @@ namespace VSModLauncher
 
             api.Event.PlayerJoin += player =>
             {
-                RegisterPearlSearch(player);
+                RegisterPearlUpdate(player);
             };
         }
 
-        public void RegisterPearlSearch(IServerPlayer player)
+        public void RegisterPearlUpdate(IServerPlayer player)
         {
-            TrackData data = Tracker.GetTrackData(player.PlayerUID);
-            BlockPos pos = data?.lastPos;
-            if (pos != null)
+            FullTrackData data = Tracker.GetTrackData(player.PlayerUID);
+            BlockPos pos = data?.trackData?.LastPos;
+
+            if (pos != null && player?.PlayerUID != null)
             {
                 sapi.Permissions.SetRole(player, "suvisitor");
+                string uid = player.PlayerUID;
 
-                TrackerIDs[player.PlayerUID] = sapi.Event.RegisterGameTickListener(dt =>
+                TrackerIDs[uid] = sapi.Event.RegisterGameTickListener(dt =>
                 {
-                    bool wasunloaded = false;
-
-                    if (data != null)
+                    try
                     {
-                        wasunloaded = data.TryLoadChunk();
-                        (data.ItemStack.Item as ItemShackleGear)?.UpdateFuelState(sapi.World, data.Slot);
-                    }
-                    else sapi.Event.UnregisterGameTickListener(TrackerIDs[player.PlayerUID]);
+                        bool wasunloaded = false;
 
-                    if (wasunloaded) data.TryUnloadChunk();
+                        if (data != null)
+                        {
+                            wasunloaded = data.TryLoadChunk();
+                            (data.ItemStack.Item as ItemShackleGear)?.UpdateFuelState(sapi.World, data.Slot);
+                        }
+                        else sapi.Event.UnregisterGameTickListener(TrackerIDs[uid]);
+
+                        if (wasunloaded) data.TryUnloadChunk();
+                    }
+                    catch (Exception ex)
+                    {
+                        sapi.World.Logger.Debug("[ShackleGear] Exception thrown: " + ex);
+                        sapi.Event.UnregisterGameTickListener(TrackerIDs[uid]);
+                    }
+
                 }, 500);
             }
         }

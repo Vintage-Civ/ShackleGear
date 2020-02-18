@@ -34,13 +34,13 @@ namespace VSModLauncher.BlockEntityBehaviors
                         string uid = slot.Itemstack.Attributes.GetString("pearled_uid");
                         if (uid != null)
                         {
-                            TrackData data = Tracker.GetTrackData(uid);
-                            if (data != null)
+                            FullTrackData data = Tracker.GetTrackData(uid);
+                            if (data.trackData != null)
                             {
-                                data.SetLocation(Pos);
-                                data.SlotReference.InventoryID = slot.Inventory.InventoryID;
-                                data.SlotReference.SlotID = slot.Inventory.GetSlotId(slot);
-                                data.LastHolderUID = ((EntityPlayer)entity).PlayerUID;
+                                data.trackData.SetLocation(Pos);
+                                data.trackData.SlotReference.InventoryID = slot.Inventory.InventoryID;
+                                data.trackData.SlotReference.SlotID = slot.Inventory.GetSlotId(slot);
+                                data.trackData.LastHolderUID = ((EntityPlayer)entity).PlayerUID;
                             }
                         }   
                     }
