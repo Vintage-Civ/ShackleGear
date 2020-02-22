@@ -23,58 +23,44 @@ namespace ShackleGear.Datasource
         public IServerPlayer LastHolder { get => (IServerPlayer)api.World.PlayerByUid(trackData.LastHolderUID); }
         public Vec3i LastChunkPos { get => new Vec3i(trackData.LastPos.X / Chunksize, trackData.LastPos.Y / Chunksize, trackData.LastPos.Z / Chunksize) ?? null; }
         private int Chunksize { get => api.World.BlockAccessor.ChunkSize; }
-        public bool IsChunkLoaded { get; private set; }
+        public bool IsChunkForceLoaded { get; private set; }
 
         public ItemSlot Slot
         {
             get
             {
                 ItemSlot slot = null;
-
-                bool wasunloaded = TryLoadChunk();
-                if (LastHolder?.InventoryManager?.Inventories != null && LastHolder.InventoryManager.Inventories.ContainsKey(trackData.SlotReference.InventoryID))
+                if (IsChunkForceLoaded)
                 {
-                    slot = LastHolder.InventoryManager.Inventories[trackData.SlotReference.InventoryID][trackData.SlotReference.SlotID];
+                    if (LastHolder?.InventoryManager?.Inventories != null && LastHolder.InventoryManager.Inventories.ContainsKey(trackData.SlotReference.InventoryID))
+                    {
+                        slot = LastHolder.InventoryManager.Inventories[trackData.SlotReference.InventoryID][trackData.SlotReference.SlotID];
+                    }
+                    else
+                    {
+                        slot = (api.World.BlockAccessor.GetBlockEntity(trackData.LastPos) as IBlockEntityContainer)?.Inventory?[trackData.SlotReference.SlotID];
+                    }
                 }
-                else
-                {
-                    slot = (api.World.BlockAccessor.GetBlockEntity(trackData.LastPos) as IBlockEntityContainer)?.Inventory?[trackData.SlotReference.SlotID];
-                }
-                
-                if (wasunloaded) api.Event.RegisterCallback(dt => TryUnloadChunk(), 500);
                 return slot;
             }
         }
 
-        public bool TryLoadChunk()
+        public void LoadMyChunk()
         {
-            if (LastChunkPos == null) return false;
-
-            IsChunkLoaded = api.WorldManager.GetChunk(LastChunkPos.X, LastChunkPos.Y, LastChunkPos.Z) != null;
-            if (!IsChunkLoaded)
+            api.WorldManager.LoadChunkColumnFast(LastChunkPos.X, LastChunkPos.Z, new ChunkLoadOptions() { KeepLoaded = true, OnLoaded = () => 
             {
-                api.WorldManager.LoadChunkColumnFast(LastChunkPos.X, LastChunkPos.Z, new ChunkLoadOptions() { KeepLoaded = true });
+                IsChunkForceLoaded = true;
 #if DEBUG
-                api.World.Logger.Debug("[SHACKLE-GEAR] CHUNK LOADING: " + LastChunkPos);
+                api.World.Logger.Debug("[ShackleGear] Chunk Column Loaded: " + LastChunkPos.X + ", " + LastChunkPos.Z);
 #endif
             }
-            return !IsChunkLoaded;
+            });
         }
 
-        public bool TryUnloadChunk()
+        public void MarkUnloadable()
         {
-            if (LastChunkPos == null) return false;
-
-            IsChunkLoaded = api.WorldManager.GetChunk(LastChunkPos.X, LastChunkPos.Y, LastChunkPos.Z) != null;
-            if (IsChunkLoaded)
-            {
-                api.WorldManager.UnloadChunkColumn(LastChunkPos.X, LastChunkPos.Z);
-#if DEBUG
-                api.World.Logger.Debug("[SHACKLE-GEAR] CHUNK UNLOADING: " + LastChunkPos);
-#endif
-                IsChunkLoaded = false;
-            }
-            return !IsChunkLoaded;
+            api.WorldManager.LoadChunkColumnFast(LastChunkPos.X, LastChunkPos.Z, new ChunkLoadOptions() { KeepLoaded = false });
+            IsChunkForceLoaded = false;
         }
     }
 

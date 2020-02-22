@@ -58,22 +58,20 @@ namespace ShackleGear
                 {
                     try
                     {
-                        bool wasunloaded = false;
+                        data.LoadMyChunk();
 
-                        if (data?.ItemStack?.Item as ItemShackleGear != null)
+                        if (data.IsChunkForceLoaded)
                         {
-                            wasunloaded = data.TryLoadChunk();
                             ((ItemShackleGear)data.ItemStack.Item).UpdateFuelState(sapi.World, data.Slot);
+                            data.MarkUnloadable();
                         }
-                        else sapi.Event.UnregisterGameTickListener(TrackerIDs[uid]);
-
-                        if (wasunloaded) data.TryUnloadChunk();
                     }
                     catch (Exception ex)
                     {
 #if DEBUG
                         sapi.World.Logger.Debug("[ShackleGear] Exception thrown: " + ex);
 #endif
+                        data.MarkUnloadable();
                         sapi.Event.UnregisterGameTickListener(TrackerIDs[uid]);
                     }
 
