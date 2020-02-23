@@ -70,11 +70,12 @@
     <Compile Include="src\Systems\ClassRegistry.cs" />
     <Compile Include="src\Systems\Commands\SGDebug.cs" />
     <Compile Include="src\Systems\Commands\SGFree.cs" />
+    <Compile Include="src\Systems\Commands\SGFuelLog.cs" />
     <Compile Include="src\Systems\Commands\SGGetUID.cs" />
     <Compile Include="src\Systems\Commands\SGLocate.cs" />
     <Compile Include="src\Systems\Commands\SGWho.cs" />
     <Compile Include="src\Systems\Commands\SGXFree.cs" />
-    <Compile Include="src\Systems\Commands\SGXPearl.cs" />
+    <Compile Include="src\Systems\Commands\SGXShackle.cs" />
     <Compile Include="src\EntityBehaviors\EntityBehaviorGearFinder.cs" />
     <Compile Include="src\BlockEntityBehaviors\BEBehaviorGearFinder..cs" />
     <Compile Include="src\Systems\PrisonController.cs" />

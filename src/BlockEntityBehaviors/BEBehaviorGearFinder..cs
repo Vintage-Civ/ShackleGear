@@ -49,7 +49,6 @@ namespace ShackleGear.BlockEntityBehaviors
                 });
                 Tracker.SaveTrackToDB();
             }, 500);
-            
         }
     }
 }

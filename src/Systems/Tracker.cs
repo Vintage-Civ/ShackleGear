@@ -67,6 +67,7 @@ namespace ShackleGear.Datasource
                 if (val.trackData?.PrisonerUID == null || val.trackData?.PrisonerUID == prisoner.PlayerUID)
                 {
                     fulltrackeditem = val;
+                    val.MarkUnloadable();
                     found = true;
                     break;
                 }

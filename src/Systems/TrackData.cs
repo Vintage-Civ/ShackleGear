@@ -47,19 +47,28 @@ namespace ShackleGear.Datasource
 
         public void LoadMyChunk()
         {
-            api.WorldManager.LoadChunkColumnFast(LastChunkPos.X, LastChunkPos.Z, new ChunkLoadOptions() { KeepLoaded = true, OnLoaded = () => 
+            if (!IsChunkForceLoaded)
             {
-                IsChunkForceLoaded = true;
+                api.WorldManager.LoadChunkColumnFast(LastChunkPos.X, LastChunkPos.Z, new ChunkLoadOptions()
+                {
+                    KeepLoaded = true,
+                    OnLoaded = () =>
+                    {
+                        IsChunkForceLoaded = true;
 #if DEBUG
-                api.World.Logger.Debug("[ShackleGear] Chunk Column Loaded: " + LastChunkPos.X + ", " + LastChunkPos.Z);
+                        api.World.Logger.Debug("[ShackleGear] Chunk Column Loaded: " + LastChunkPos.X + ", " + LastChunkPos.Z);
 #endif
+                        var be = api.World.BlockAccessor.GetBlockEntity(trackData.LastPos);
+                        be?.Initialize(api);
+                    }
+                });
             }
-            });
         }
 
         public void MarkUnloadable()
         {
             api.WorldManager.LoadChunkColumnFast(LastChunkPos.X, LastChunkPos.Z, new ChunkLoadOptions() { KeepLoaded = false });
+            api.World.Logger.Debug("[ShackleGear] Chunk Column Marked Unloadable: " + LastChunkPos.X + ", " + LastChunkPos.Z);
             IsChunkForceLoaded = false;
         }
     }
@@ -67,12 +76,13 @@ namespace ShackleGear.Datasource
     [JsonObject(MemberSerialization.OptIn, ItemReferenceLoopHandling = ReferenceLoopHandling.Ignore)]
     public class TrackData
     {
-        public TrackData(SlotReference slotReference, BlockPos lastPos, string prisonerUID, string lastHolderUID)
+        public TrackData(SlotReference slotReference, BlockPos lastPos, string prisonerUID, string lastHolderUID, string lastFuelerUID)
         {
             SlotReference = slotReference;
             LastPos = lastPos;
             PrisonerUID = prisonerUID;
             LastHolderUID = lastHolderUID;
+            LastFuelerUID = lastFuelerUID;
         }
 
         [JsonProperty(ItemReferenceLoopHandling = ReferenceLoopHandling.Ignore)]
@@ -86,7 +96,10 @@ namespace ShackleGear.Datasource
 
         [JsonProperty(ItemReferenceLoopHandling = ReferenceLoopHandling.Ignore)]
         public string LastHolderUID { get; set; }
-        
+
+        [JsonProperty(ItemReferenceLoopHandling = ReferenceLoopHandling.Ignore)]
+        public string LastFuelerUID { get; set; }
+
         public void SetLocation(int x, int y, int z)
         {
             LastPos.X = x; LastPos.Y = y; LastPos.Z = z;

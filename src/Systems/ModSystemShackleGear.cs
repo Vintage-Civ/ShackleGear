@@ -18,7 +18,7 @@ namespace ShackleGear
         public PrisonController Prison { get; private set; }
         ICoreAPI api;
         ICoreServerAPI sapi;
-        Dictionary<string, long> TrackerIDs = new Dictionary<string, long>();
+        public Dictionary<string, long> TrackerIDs = new Dictionary<string, long>();
         ShackleGearTracker Tracker { get => api.ModLoader.GetModSystem<ShackleGearTracker>(); }
 
         public override void Start(ICoreAPI api)
@@ -59,11 +59,12 @@ namespace ShackleGear
                     try
                     {
                         data.LoadMyChunk();
-
                         if (data.IsChunkForceLoaded)
                         {
-                            ((ItemShackleGear)data.ItemStack.Item).UpdateFuelState(sapi.World, data.Slot);
-                            data.MarkUnloadable();
+                            if (data.ItemStack?.Item is ItemShackleGear)
+                            {
+                                ((ItemShackleGear)data.ItemStack.Item).UpdateFuelState(sapi.World, data.Slot);
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -94,7 +95,7 @@ namespace ShackleGear
                 {
                     if (slot?.Itemstack?.Item is ItemShackleGear && (slot?.Itemstack.Attributes.GetString("pearled_uid") == null))
                     {
-                        Prison.ImprisonPlayer(byplayer, (IServerPlayer)killer, slot);
+                        Prison.TryImprisonPlayer(byplayer, (IServerPlayer)killer, slot);
 #if DEBUG
                         sapi.World.Logger.Notification("[SHACKLEGEAR] Gear Found.");
 #endif

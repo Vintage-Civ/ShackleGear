@@ -40,7 +40,7 @@ namespace ShackleGear.Items
 #if DEBUG
             if (world is IServerWorldAccessor)
             {
-                world.Logger.Debug("[SHACKLE-GEAR] Shackle Item Modified");
+                //world.Logger.Debug("[SHACKLE-GEAR] Shackle Item Modified");
             }
 #endif
         }
@@ -81,6 +81,7 @@ namespace ShackleGear.Items
                             s.TakeOut(1);
                             s.MarkDirty();
                             slot.MarkDirty();
+                            if (attribs.GetString("pearled_uid") != null) Tracker.GetTrackData(attribs.GetString("pearled_uid")).trackData.LastFuelerUID = (byEntity as EntityPlayer).PlayerUID;
                             return true;
                         }
                         return false;

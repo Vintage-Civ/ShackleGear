@@ -23,8 +23,9 @@ namespace ShackleGear
             api.RegisterCommand("sglocate", "Displays the location of your shackle gear, if you're shackled", "/sglocate", new SGLocate().Handler);
             api.RegisterCommand("sgwho", "Displays the name of the player in a held shackle", "/sgwho", new SGWho().Handler);
             api.RegisterCommand("sgdebug", "Debug command for shackle-gear", "/sgdebug", new SGDebug().Handler);
-            api.RegisterCommand("sgxfree", "Frees a shackled player", "/sgxfree", new SGXFree(api).Handler, Privilege.ban);
-            api.RegisterCommand("sgxpearl", "Imprisons a player and gives you the shackle", "/sgxPearl", new SGXPearl(api).Handler, Privilege.ban);
+            api.RegisterCommand("sgfuellog", "Shows who last fueled your shackle-gear", "/sgfuellog", new SGFuelLog(api).Handler);
+            api.RegisterCommand("sgxfree", "Frees a shackled player", "/sgxfree", new SGXFree(Prison, Tracker).Handler, Privilege.ban);
+            api.RegisterCommand("sgxshackle", "Imprisons a player.", "/sgxPearl", new SGXShackle(Prison).Handler, Privilege.ban);
         }
     }
 }

@@ -1,23 +1,20 @@
 using ShackleGear.Controllers;
-using ShackleGear.Datasource;
-using System;
-using System.Linq;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Server;
+using System.Linq;
+using ShackleGear.Items;
+using System;
 
 namespace ShackleGear.Commands
 {
-    public class SGXFree
+    public class SGXShackle
     {
-
         PrisonController Prison;
-        ShackleGearTracker Tracker;
 
-        public SGXFree(PrisonController prison, ShackleGearTracker tracker)
+        public SGXShackle(PrisonController prison)
         {
             Prison = prison;
-            Tracker = tracker;
         }
 
         public void Handler(IServerPlayer player, int groupid, CmdArgs args)
@@ -44,9 +41,20 @@ namespace ShackleGear.Commands
                     }
                     if (prisoner?.PlayerUID != null)
                     {
-                        i = 47;
-                        Prison.FreePlayer(prisoner.PlayerUID, Tracker.GetTrackData(prisoner.PlayerUID).Slot);
-                        player.SendMessage(GlobalConstants.GeneralChatGroup, "Player " + prisoner.PlayerName + " Freed.", EnumChatType.OwnMessage);
+                        i = 44;
+                        if (slot?.Itemstack?.Item is ItemShackleGear)
+                        {
+                            i = 47;
+                            if (Prison.TryImprisonPlayer(prisoner, player, slot))
+                            {
+                                i = 50;
+                                player.SendMessage(GlobalConstants.GeneralChatGroup, "Player " + prisoner.PlayerName + " Shackled.", EnumChatType.OwnMessage);
+                            }
+                            else
+                            {
+                                player.SendMessage(GlobalConstants.GeneralChatGroup, "Not holding a ShackleGear.", EnumChatType.OwnMessage);
+                            }
+                        }
                     }
                     else
                     {
@@ -63,6 +71,7 @@ namespace ShackleGear.Commands
                 player.Entity.World.Logger.Debug("[ShackleGear] Exception thrown after: " + i);
                 player.Entity.World.Logger.Debug("[ShackleGear] Ex: " + ex);
             }
+
         }
     }
 }
