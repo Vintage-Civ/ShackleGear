@@ -14,6 +14,10 @@ namespace ShackleGear.Datasource
         public List<TrackData> Tracked { get; set; } = new List<TrackData>();
 
         ICoreServerAPI sapi;
+#if DEBUG
+        public int beInits { get; set; }
+        public int eInits { get; set; }
+#endif
 
         public override bool ShouldLoad(EnumAppSide forSide) => forSide == EnumAppSide.Server;
 

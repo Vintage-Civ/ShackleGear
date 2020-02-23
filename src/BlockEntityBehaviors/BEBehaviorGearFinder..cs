@@ -23,6 +23,14 @@ namespace ShackleGear.BlockEntityBehaviors
 
         public override void Initialize(ICoreAPI api, JsonObject properties)
         {
+#if DEBUG
+            Tracker.beInits++;
+            if (Tracker.beInits > 19)
+            {
+                api.World.Logger.Debug("[ShackleGear] 20 Block Entity Behavior Inits.");
+                Tracker.beInits = 0;
+            }
+#endif
             base.Initialize(api, properties);
             if (!api.Side.IsServer()) return;
 
