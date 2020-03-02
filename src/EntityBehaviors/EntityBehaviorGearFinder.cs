@@ -21,14 +21,6 @@ namespace ShackleGear.EntityBehaviors
 
         public override void Initialize(EntityProperties properties, JsonObject attributes)
         {
-#if DEBUG
-            Tracker.eInits++;
-            if (Tracker.eInits > 19)
-            {
-                entity.World.Logger.Debug("[ShackleGear] 20 Entity Behavior Inits.");
-                Tracker.eInits = 0;
-            }
-#endif
             base.Initialize(properties, attributes);
             if (!entity.World.Side.IsServer()) return;
 

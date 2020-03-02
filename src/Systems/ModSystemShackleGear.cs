@@ -10,6 +10,7 @@ using ShackleGear.Controllers;
 using ShackleGear.Datasource;
 using ShackleGear.Items;
 using ShackleGear.EntityBehaviors;
+using Vintagestory.API.Config;
 
 namespace ShackleGear
 {
@@ -119,6 +120,8 @@ namespace ShackleGear
 #endif
             foreach (var inventory in byplayer.InventoryManager.Inventories)
             {
+                string name = inventory.Value.ClassName;
+                if (name == "chest" || name == GlobalConstants.creativeInvClassName || name == GlobalConstants.groundInvClassName || name == GlobalConstants.creativeInvClassName) continue;
                 foreach (var slot in inventory.Value)
                 {
                     if (slot is ItemSlotCreative) continue;
