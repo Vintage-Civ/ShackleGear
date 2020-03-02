@@ -5,6 +5,7 @@ using Vintagestory.API.Datastructures;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
 using ShackleGear.Datasource;
+using System;
 
 namespace ShackleGear.Controllers
 {
@@ -67,10 +68,11 @@ namespace ShackleGear.Controllers
             sapi.Server.Logger.Debug("[SHACKLE-GEAR] Imprison Function Fired");
 #endif
             if (attribs == null) return false;
+            var ms = DateTime.UtcNow.Ticks / 10000000.0;
 
             attribs.SetString("pearled_uid", prisoner.PlayerUID);
             attribs.SetString("pearled_name", prisoner.PlayerName);
-            attribs.SetDouble("pearled_timestamp", sapi.World.Calendar.TotalHours);
+            attribs.SetDouble("pearled_timestamp", ms);
 
             SetSpawnInAttributes(attribs, prisoner);
             prisoner.SpawnPosition.SetPos(prisoner.Entity.ServerPos.XYZ);

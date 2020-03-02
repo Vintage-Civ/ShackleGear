@@ -10,7 +10,7 @@
         "base": "item/shacklegear"
     },
     "attributes": {
-        "fuelmult": 472.65625,
+        "fuelmult": 1,
         "maxseconds": 1209600
     },
     "maxstacksize": 1,

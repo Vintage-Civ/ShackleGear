@@ -121,7 +121,8 @@ namespace ShackleGear.Items
                 {
                     if (attribs.GetDouble("pearled_timestamp", -1.0) != -1.0)
                     {
-                        double dt = (world.Calendar.TotalHours - attribs.GetFloat("pearled_timestamp")) / 60;
+                        var ms = DateTime.UtcNow.Ticks / 10000000.0;
+                        double dt = ms - attribs.GetFloat("pearled_timestamp");
                         double fuel = attribs.GetDouble("pearled_fuel", 0.0f);
                         if (fuel < 0f)
                         {
