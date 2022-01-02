@@ -124,6 +124,9 @@ namespace ShackleGear.Items
                         var ms = DateTime.UtcNow.Ticks / 10000000.0;
                         double dt = ms - attribs.GetFloat("pearled_timestamp");
                         double fuel = attribs.GetDouble("pearled_fuel", 0.0f);
+#if DEBUG
+                        world.Logger.Debug(string.Format("[SHACKLE-GEAR] Fuel Left On This Tick: {0} Units", Math.Round(fuel, 3)));
+#endif
                         if (fuel < 0f)
                         {
                             Prsn.FreePlayer(attribs.GetString("pearled_uid"), inSlot);
