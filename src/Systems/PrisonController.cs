@@ -28,7 +28,9 @@ namespace ShackleGear.Controllers
             {
                 sapi.Permissions.SetRole(serverPlayer, "suplayer");
                 ITreeAttribute attribs = slot?.Itemstack?.Attributes;
-                if (attribs != null) serverPlayer.SpawnPosition.SetPos(GetSpawnFromAttributes(attribs));
+                var vec = GetSpawnFromAttributes(attribs);
+
+                if (attribs != null) serverPlayer.SetSpawnPosition(new PlayerSpawnPos() { x = (int)vec.X, y = (int)vec.Y, z = (int)vec.Z });
 
                 serverPlayer.SendMessage(GlobalConstants.GeneralChatGroup, "You've been freed!", EnumChatType.Notification);
                 if (slot != null)
@@ -49,9 +51,10 @@ namespace ShackleGear.Controllers
         {
             if (!attribs.HasAttribute("pearled_x"))
             {
-                attribs.SetDouble("pearled_x", player.SpawnPosition.X);
-                attribs.SetDouble("pearled_y", player.SpawnPosition.Y);
-                attribs.SetDouble("pearled_z", player.SpawnPosition.Z);
+                var pos = player.GetSpawnPosition(false);
+                attribs.SetDouble("pearled_x", pos.X);
+                attribs.SetDouble("pearled_y", pos.Y);
+                attribs.SetDouble("pearled_z", pos.Z);
             }
         }
 
@@ -75,7 +78,8 @@ namespace ShackleGear.Controllers
             attribs.SetDouble("pearled_timestamp", ms);
 
             SetSpawnInAttributes(attribs, prisoner);
-            prisoner.SpawnPosition.SetPos(prisoner.Entity.ServerPos.XYZ);
+            var vec = prisoner.Entity.ServerPos.XYZ;
+            prisoner.SetSpawnPosition(new PlayerSpawnPos() { x = vec.XInt, y = vec.YInt, z = vec.ZInt});
 
             if (!sapi.ModLoader.GetModSystem<ShackleGearTracker>().RemoveItemFromTrack(prisoner))
             {

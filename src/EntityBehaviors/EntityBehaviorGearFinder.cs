@@ -4,6 +4,7 @@ using Vintagestory.API.Common.Entities;
 using Vintagestory.API.MathTools;
 using ShackleGear.Datasource;
 using ShackleGear.Items;
+using Vintagestory.API.Datastructures;
 
 namespace ShackleGear.EntityBehaviors
 {

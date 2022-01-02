@@ -49,7 +49,7 @@ namespace ShackleGear.Datasource
         {
             if (!IsChunkForceLoaded)
             {
-                api.WorldManager.LoadChunkColumnFast(LastChunkPos.X, LastChunkPos.Z, new ChunkLoadOptions()
+                api.WorldManager.LoadChunkColumnPriority(LastChunkPos.X, LastChunkPos.Z, new ChunkLoadOptions()
                 {
                     KeepLoaded = true,
                     OnLoaded = () =>
@@ -67,7 +67,7 @@ namespace ShackleGear.Datasource
 
         public void MarkUnloadable()
         {
-            api.WorldManager.LoadChunkColumnFast(LastChunkPos.X, LastChunkPos.Z, new ChunkLoadOptions() { KeepLoaded = false });
+            api.WorldManager.LoadChunkColumnPriority(LastChunkPos.X, LastChunkPos.Z, new ChunkLoadOptions() { KeepLoaded = false });
             api.World.Logger.Debug("[ShackleGear] Chunk Column Marked Unloadable: " + LastChunkPos.X + ", " + LastChunkPos.Z);
             IsChunkForceLoaded = false;
         }

@@ -9,6 +9,7 @@ using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
 using ShackleGear.Datasource;
 using ShackleGear.Items;
+using Vintagestory.API.Datastructures;
 
 namespace ShackleGear.BlockEntityBehaviors
 {
