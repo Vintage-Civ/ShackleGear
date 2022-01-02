@@ -21,7 +21,7 @@ namespace ShackleGear.Controllers
         public bool FreePlayer(string uid, ItemSlot slot, bool destroy = true)
         {
 #if DEBUG
-            sapi.Server.Logger.Debug("[SHACKLE-GEAR] Free Function Fired");
+            sapi.Server.Logger.Debug(string.Format("[SHACKLE-GEAR] Free Function Fired, Call Stack: {0}", Environment.StackTrace));
 #endif
             IServerPlayer serverPlayer = sapi.World.PlayerByUid(uid) as IServerPlayer;
             if (serverPlayer != null)
@@ -68,7 +68,7 @@ namespace ShackleGear.Controllers
             //imprison some player
             ITreeAttribute attribs = slot?.Itemstack?.Attributes;
 #if DEBUG
-            sapi.Server.Logger.Debug("[SHACKLE-GEAR] Imprison Function Fired");
+            sapi.Server.Logger.Debug(string.Format("[SHACKLE-GEAR] Imprison Function Fired, Call Stack: {0}", Environment.StackTrace));
 #endif
             if (attribs == null) return false;
             var ms = DateTime.UtcNow.Ticks / 10000000.0;
