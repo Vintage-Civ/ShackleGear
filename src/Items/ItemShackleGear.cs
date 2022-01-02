@@ -126,6 +126,8 @@ namespace ShackleGear.Items
                         double fuel = attribs.GetDouble("pearled_fuel", 0.0f);
 #if DEBUG
                         world.Logger.Debug(string.Format("[SHACKLE-GEAR] Fuel Left On This Tick: {0} Units", Math.Round(fuel, 3)));
+                        world.Logger.Debug(string.Format("[SHACKLE-GEAR] TimeStamp: {0}", Math.Round(attribs.GetFloat("pearled_timestamp"), 3)));
+                        world.Logger.Debug(string.Format("[SHACKLE-GEAR] MS: {0}", Math.Round(ms, 3)));
 #endif
                         if (fuel < 0f)
                         {
