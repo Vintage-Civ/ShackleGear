@@ -71,11 +71,11 @@ namespace ShackleGear.Controllers
             sapi.Server.Logger.Debug(string.Format("[SHACKLE-GEAR] Imprison Function Fired, Call Stack: {0}", Environment.StackTrace));
 #endif
             if (attribs == null) return false;
-            var ms = DateTime.UtcNow.Ticks / 10000000.0;
+            long ms = DateTime.UtcNow.Ticks;
 
             attribs.SetString("pearled_uid", prisoner.PlayerUID);
             attribs.SetString("pearled_name", prisoner.PlayerName);
-            attribs.SetDouble("pearled_timestamp", ms);
+            attribs.SetLong("pearled_timestamp", ms);
 
             SetSpawnInAttributes(attribs, prisoner);
             var vec = prisoner.Entity.ServerPos.XYZ;

@@ -121,22 +121,22 @@ namespace ShackleGear.Items
                 {
                     if (attribs.GetDouble("pearled_timestamp", -1.0) != -1.0)
                     {
-                        var ms = DateTime.UtcNow.Ticks / 10000000.0;
-                        double dt = ms - attribs.GetFloat("pearled_timestamp");
+                        long ms = DateTime.UtcNow.Ticks;
+                        long dt = ms - attribs.GetLong("pearled_timestamp");
                         double fuel = attribs.GetDouble("pearled_fuel", 0.0f);
 #if DEBUG
                         world.Logger.Debug(string.Format("[SHACKLE-GEAR] Fuel Left On This Tick: {0} Units", Math.Round(fuel, 3)));
                         world.Logger.Debug(string.Format("[SHACKLE-GEAR] TimeStamp: {0}", Math.Round(attribs.GetFloat("pearled_timestamp"), 3)));
-                        world.Logger.Debug(string.Format("[SHACKLE-GEAR] MS: {0}", Math.Round(ms, 3)));
+                        world.Logger.Debug(string.Format("[SHACKLE-GEAR] MS: {0}", ms));
 #endif
                         if (fuel < 0f)
                         {
                             Prsn.FreePlayer(attribs.GetString("pearled_uid"), inSlot);
-                            attribs.SetDouble("pearled_timestamp", -1.0);
+                            attribs.SetLong("pearled_timestamp", -1);
                         }
                         else
                         {
-                            attribs.SetDouble("pearled_fuel", fuel - dt);
+                            attribs.SetDouble("pearled_fuel", fuel - (double)(dt / 10000000.0));
                         }
                     }
                 }
