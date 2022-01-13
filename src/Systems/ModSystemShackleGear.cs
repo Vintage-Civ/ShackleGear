@@ -68,7 +68,9 @@ namespace ShackleGear
                             }
                         }
                     }
+#pragma warning disable CS0168 // Variable is declared but never used
                     catch (Exception ex)
+#pragma warning restore CS0168 // Variable is declared but never used
                     {
 #if DEBUG
                         sapi.World.Logger.Debug("[ShackleGear] Exception thrown: " + ex);
