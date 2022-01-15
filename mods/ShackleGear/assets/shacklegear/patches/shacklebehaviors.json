@@ -9,11 +9,19 @@
     },
     { 
         "op": "add", "path": "/entityBehaviors", "value": [ { "name": "gearfinder" } ],
-        "file": "game:blocktypes/wood/generic/chest.json"
+        "file": "game:blocktypes/wood/chest.json"
     },
     { 
         "op": "add", "path": "/entityBehaviors", "value": [ { "name": "gearfinder" } ],
-        "file": "game:blocktypes/wood/generic/chest-labeled.json"
+        "file": "game:blocktypes/wood/chest-labeled.json"
+    },
+    { 
+        "op": "add", "path": "/entityBehaviors", "value": [ { "name": "gearfinder" } ],
+        "file": "game:blocktypes/wood/chest-trunk.json"
+    },
+    { 
+        "op": "add", "path": "/entityBehaviors", "value": [ { "name": "gearfinder" } ],
+        "file": "game:blocktypes/wood/stationarybasket.json"
     },
     { 
         "op": "add", "path": "/entityBehaviors", "value": [ { "name": "gearfinder" } ],
