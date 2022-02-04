@@ -47,6 +47,36 @@ namespace ShackleGear.Controllers
             return false;
         }
 
+        public void MovePlayer(string uid, BlockPos pos)
+        {
+            IServerPlayer serverPlayer = sapi.World.PlayerByUid(uid) as IServerPlayer;
+            if (pos != null && serverPlayer != null)
+            {
+                serverPlayer.Entity.TeleportTo(pos.X, pos.Y, pos.Z);
+            }
+        }
+
+        public void MoveToCell(string uid)
+        {
+            MovePlayer(uid, GetCellSpawn(uid));
+        }
+
+        public void SetCellSpawn(string uid, BlockPos pos)
+        {
+            IServerPlayer serverPlayer = sapi.World.PlayerByUid(uid) as IServerPlayer;
+            if (pos != null && serverPlayer != null)
+            {
+                serverPlayer.Entity.WatchedAttributes.SetVec3i("shackled_cell", pos.ToVec3i());
+            }
+        }
+
+        public BlockPos GetCellSpawn(string uid)
+        {
+            IServerPlayer serverPlayer = sapi.World.PlayerByUid(uid) as IServerPlayer;
+            
+            return serverPlayer?.Entity?.WatchedAttributes?.GetVec3i("shackled_cell")?.AsBlockPos;
+        }
+
         public void SetSpawnInAttributes(ITreeAttribute attribs, IServerPlayer player)
         {
             if (!attribs.HasAttribute("pearled_x"))

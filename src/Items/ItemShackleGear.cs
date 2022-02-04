@@ -10,6 +10,7 @@ using ShackleGear.Controllers;
 using ShackleGear.Datasource;
 using System.Collections.Generic;
 using Vintagestory.Client.NoObf;
+using Vintagestory.GameContent;
 
 namespace ShackleGear.Items
 {
@@ -64,9 +65,38 @@ namespace ShackleGear.Items
 
             if (sapi != null && attribs != null)
             {
-                if (byEntity.Controls.Sneak && attribs.GetString("pearled_uid") != null)
+                var pos = blockSel?.Position;
+                string uid = attribs.GetString("pearled_uid");
+                double cooldown = attribs.GetDouble("shackled_cell_cooldown");
+
+                if (api.World.Calendar.TotalHours > cooldown && uid != null && pos != null && sapi.World.BlockAccessor.GetBlock(pos) is BlockBed)
                 {
-                    Prsn.FreePlayer(attribs.GetString("pearled_uid"), slot);
+                    if (slot.Inventory.Any(s =>
+                    {
+                        ItemStack stack = s?.Itemstack;
+                        Item item = stack?.Item;
+
+                        if (item is ItemRustyGear && stack.StackSize >= 3)
+                        {
+                            s.TakeOut(3);
+                            s.MarkDirty();
+                            slot.MarkDirty();
+                            attribs.SetDouble("shackled_cell_cooldown", api.World.Calendar.TotalHours + 24);
+                            attribs.SetBlockPos("shackled_cell", pos);
+
+                            Prsn.SetCellSpawn(uid, pos);
+                            Prsn.MoveToCell(uid);
+
+                            return true;
+                        }
+
+                        return false;
+                    })) { handling = EnumHandHandling.Handled; };
+                    
+                }
+                else if (byEntity.Controls.Sneak && uid != null)
+                {
+                    Prsn.FreePlayer(uid, slot);
                 }
                 else
                 {
@@ -94,12 +124,19 @@ namespace ShackleGear.Items
         public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
         {
             ITreeAttribute attribs = inSlot?.Itemstack?.Attributes;
-            string imprisonedName = attribs?.GetString("pearled_name") ?? "Nobody";
-            string imprisonedUID = attribs?.GetString("pearled_uid") ?? "Empty";
+            string imprisonedName = attribs?.GetString("pearled_name");
+            string imprisonedUID = attribs?.GetString("pearled_uid");
             double fueledFor = Math.Round(attribs?.GetDouble("pearled_fuel", 0) ?? 0.0f, 3);
+            double cooldown = attribs?.GetDouble("shackled_cell_cooldown") ?? 0;
+            bool inCooldown = cooldown > world.Calendar.TotalHours;
+            int timeLeft = (int)Math.Round(cooldown - world.Calendar.TotalHours);
+
             TimeSpan time = TimeSpan.FromSeconds(fueledFor);
 
-            dsc.AppendLine("Shackled: " + imprisonedName).AppendLine("UID: " + imprisonedUID).AppendLine("Remaining Time: " + time.ToString(@"dd\:hh\:mm\:ss"));
+            dsc.AppendLine("Shackled: " + imprisonedName ?? "Nobody").AppendLine("UID: " + imprisonedUID ?? "Empty").AppendLine("Remaining Time: " + time.ToString(@"dd\:hh\:mm\:ss"));
+            dsc.AppendLine(string.Format("Can {0} set cell spawn {1}", 
+                imprisonedName == null || inCooldown ? "not" : "", 
+                imprisonedName == null ? "nobody imprisoned!" : inCooldown ? string.Format("now, must wait {0} game hours before next cell set.", timeLeft) : "now." ));
             
             base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
         }
