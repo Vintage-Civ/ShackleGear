@@ -18,11 +18,13 @@ namespace ShackleGear.Controllers
             this.sapi = sapi;
         }
 
-        public bool FreePlayer(string uid, ItemSlot slot, bool destroy = true)
+        public bool FreePlayer(string uid, ItemSlot slot, bool destroy = true, BlockPos brokenAt = null)
         {
+            if (sapi == null) return false;
 #if DEBUG
             sapi.Server.Logger.Debug(string.Format("[SHACKLE-GEAR] Free Function Fired, Call Stack: {0}", Environment.StackTrace));
 #endif
+
             IServerPlayer serverPlayer = sapi.World.PlayerByUid(uid) as IServerPlayer;
             if (serverPlayer != null)
             {
@@ -35,7 +37,15 @@ namespace ShackleGear.Controllers
                 serverPlayer.SendMessage(GlobalConstants.GeneralChatGroup, "You've been freed!", EnumChatType.Notification);
                 if (slot != null)
                 {
-                    if (destroy) slot.TakeOutWhole();
+                    if (destroy)
+                    {
+                        if (brokenAt != null)
+                        {
+                            sapi.World.PlaySoundAt(new AssetLocation("sounds/block/glass"), brokenAt.X + 0.5, brokenAt.Y, brokenAt.Z + 0.5);
+                            sapi.World.SpawnCubeParticles(brokenAt.ToVec3d().Add(0.5, 0, 0.5), slot.Itemstack, 1, 32);
+                        }
+                        slot.TakeOutWhole();
+                    }
                     slot.MarkDirty();
                 }
 
@@ -120,6 +130,8 @@ namespace ShackleGear.Controllers
             prisoner.SendMessage(GlobalConstants.GeneralChatGroup, "You've been shackled!", EnumChatType.Notification);
 
             slot.MarkDirty();
+            (sapi.World as Vintagestory.Server.ServerMain).EventManager.TriggerPlayerRespawn(prisoner);
+            sapi.World.PlaySoundAt(new AssetLocation("sounds/wearable/chain1"), prisoner, null, false, 8, 8);
             return true;
         }
 

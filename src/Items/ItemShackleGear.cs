@@ -52,71 +52,76 @@ namespace ShackleGear.Items
             ITreeAttribute attribs = entityItem.Slot?.Itemstack?.Attributes;
             if (attribs?.GetString("pearled_uid") != null)
             {
-                Prsn.FreePlayer(attribs.GetString("pearled_uid"), entityItem.Slot);
-                entityItem.Die();
+                if (entityItem.Collided)
+                {
+                    Prsn?.FreePlayer(attribs.GetString("pearled_uid"), entityItem.Slot, true, entityItem.Pos.AsBlockPos.UpCopy());
+                    entityItem.Die();
+                }
             }
         }
 
         public override void OnHeldInteractStart(ItemSlot slot, EntityAgent byEntity, BlockSelection blockSel, EntitySelection entitySel, bool firstEvent, ref EnumHandHandling handling)
         {
-            base.OnHeldInteractStart(slot, byEntity, blockSel, entitySel, firstEvent, ref handling);
             handling = EnumHandHandling.PreventDefault;
             ITreeAttribute attribs = slot?.Itemstack?.Attributes;
+            var pos = blockSel?.Position;
 
             if (sapi != null && attribs != null)
             {
-                var pos = blockSel?.Position;
+                Block selBlock = pos != null ? sapi.World.BlockAccessor.GetBlock(pos) : null;
                 string uid = attribs.GetString("pearled_uid");
                 double cooldown = attribs.GetDouble("shackled_cell_cooldown");
 
-                if (api.World.Calendar.TotalHours > cooldown && uid != null && pos != null && sapi.World.BlockAccessor.GetBlock(pos) is BlockBed)
+                if (selBlock is BlockBed)
                 {
-                    if (slot.Inventory.Any(s =>
+                    if (api.World.Calendar.TotalHours > cooldown && uid != null)
                     {
-                        ItemStack stack = s?.Itemstack;
-                        Item item = stack?.Item;
-
-                        if (item is ItemRustyGear && stack.StackSize >= 3)
+                        foreach (var invSlot in slot.Inventory)
                         {
-                            s.TakeOut(3);
-                            s.MarkDirty();
-                            slot.MarkDirty();
-                            attribs.SetDouble("shackled_cell_cooldown", api.World.Calendar.TotalHours + 24);
-                            attribs.SetBlockPos("shackled_cell", pos);
+                            ItemStack stack = invSlot?.Itemstack;
+                            Item item = stack?.Item;
 
-                            Prsn.SetCellSpawn(uid, pos);
-                            Prsn.MoveToCell(uid);
+                            if (item is ItemRustyGear && stack.StackSize >= 2)
+                            {
+                                invSlot.TakeOut(2);
+                                invSlot.MarkDirty();
+                                slot.MarkDirty();
+                                attribs.SetDouble("shackled_cell_cooldown", api.World.Calendar.TotalHours + 24);
+                                attribs.SetBlockPos("shackled_cell", pos);
 
-                            return true;
+                                Prsn.SetCellSpawn(uid, pos);
+                                Prsn.MoveToCell(uid);
+
+                                break;
+                            }
                         }
-
-                        return false;
-                    })) { handling = EnumHandHandling.Handled; };
-                    
-                }
-                else if (byEntity.Controls.Sneak && uid != null)
-                {
-                    Prsn.FreePlayer(uid, slot);
+                    }
                 }
                 else
                 {
-                    slot.Inventory.Any(s =>
+                    if (byEntity.Controls.Sneak && uid != null)
                     {
-                        if (s?.Itemstack?.Collectible?.CombustibleProps != null)
+                        Prsn.FreePlayer(uid, slot, true, pos.UpCopy());
+                    }
+                    else
+                    {
+                        foreach (var invSlot in slot.Inventory)
                         {
-                            if (s.Itemstack.Collectible.CombustibleProps.BurnTemperature < 1000) return false;
-                            double currentfuel = attribs.GetDouble("pearled_fuel");
-                            if (currentfuel > maxSeconds) return true;
+                            if (invSlot?.Itemstack?.Collectible?.CombustibleProps != null)
+                            {
+                                if (invSlot.Itemstack.Collectible.CombustibleProps.BurnTemperature < 1000) break;
+                                double currentfuel = attribs.GetDouble("pearled_fuel");
+                                if (currentfuel > maxSeconds) break;
 
-                            attribs.SetDouble("pearled_fuel", currentfuel + (s.Itemstack.Collectible.CombustibleProps.BurnDuration * fuelMult));
-                            s.TakeOut(1);
-                            s.MarkDirty();
-                            slot.MarkDirty();
-                            if (attribs.GetString("pearled_uid") != null) Tracker.GetTrackData(attribs.GetString("pearled_uid")).trackData.LastFuelerUID = (byEntity as EntityPlayer).PlayerUID;
-                            return true;
+                                attribs.SetDouble("pearled_fuel", currentfuel + (invSlot.Itemstack.Collectible.CombustibleProps.BurnDuration * fuelMult));
+                                invSlot.TakeOut(1);
+                                invSlot.MarkDirty();
+                                slot.MarkDirty();
+                                if (attribs.GetString("pearled_uid") != null) Tracker.GetTrackData(attribs.GetString("pearled_uid")).trackData.LastFuelerUID = (byEntity as EntityPlayer).PlayerUID;
+                                break;
+                            }
                         }
-                        return false;
-                    });
+                    }
                 }
             }
         }
