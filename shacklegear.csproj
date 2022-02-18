@@ -82,7 +82,7 @@
     <Compile Include="src\Systems\Commands\SGXFree.cs" />
     <Compile Include="src\Systems\Commands\SGXShackle.cs" />
     <Compile Include="src\EntityBehaviors\EntityBehaviorGearFinder.cs" />
-    <Compile Include="src\Systems\ShackleGearHarmony.cs" />
+    <Compile Include="src\Systems\UniversalHarmonyPatcher.cs" />
     <Compile Include="src\Utility\HackMan.cs" />
     <Compile Include="src\Systems\Patches\PatchContainers.cs" />
     <Compile Include="src\Systems\PrisonController.cs" />
