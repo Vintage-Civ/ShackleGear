@@ -82,7 +82,7 @@
     <Compile Include="src\Systems\Commands\SGXFree.cs" />
     <Compile Include="src\Systems\Commands\SGXShackle.cs" />
     <Compile Include="src\EntityBehaviors\EntityBehaviorGearFinder.cs" />
-    <Compile Include="src\Systems\Patches\BEBehaviorGearFinder..cs" />
+    <Compile Include="src\Systems\Patches\PatchContainers.cs" />
     <Compile Include="src\Systems\PrisonController.cs" />
     <Compile Include="src\Systems\TrackData.cs" />
     <Compile Include="src\Systems\Tracker.cs" />
