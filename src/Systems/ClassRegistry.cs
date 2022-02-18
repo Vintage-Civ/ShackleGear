@@ -12,7 +12,6 @@ namespace ShackleGear
         public void RegisterClasses(ICoreAPI api)
         {
             api.RegisterItemClass("shackleitem", typeof(ItemShackleGear));
-            //api.RegisterBlockEntityBehaviorClass("gearfinder", typeof(BEBehaviorGearFinder));
             api.RegisterEntityBehaviorClass("gearfinder", typeof(EntityBehaviorGearFinder));
         }
 

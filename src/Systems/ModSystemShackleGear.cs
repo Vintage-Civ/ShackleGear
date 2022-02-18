@@ -11,8 +11,6 @@ using ShackleGear.Datasource;
 using ShackleGear.Items;
 using ShackleGear.EntityBehaviors;
 using Vintagestory.API.Config;
-using HarmonyLib;
-using Vintagestory.API.Client;
 
 namespace ShackleGear
 {
@@ -24,18 +22,6 @@ namespace ShackleGear
         public Dictionary<string, long> TrackerIDs = new Dictionary<string, long>();
         ShackleGearTracker Tracker { get => api.ModLoader.GetModSystem<ShackleGearTracker>(); }
 
-        const string serverHarmonyId = "Novocain.ModSystem.ShackleGear.Server";
-        const string clientHarmonyId = "Novocain.ModSystem.ShackleGear.Client";
-
-        Harmony serverHarmony;
-        Harmony clientHarmony;
-
-        public override void Dispose()
-        {
-            serverHarmony?.UnpatchAll(serverHarmonyId);
-            clientHarmony?.UnpatchAll(clientHarmonyId);
-        }
-
         public override void Start(ICoreAPI api)
         {
             this.api = api;
@@ -45,7 +31,6 @@ namespace ShackleGear
         public override void StartServerSide(ICoreServerAPI api)
         {
             sapi = api;
-            serverHarmony = new Harmony(serverHarmonyId);
 
             Prison = new PrisonController(sapi);
             RegisterServerCommands(sapi);
@@ -58,15 +43,6 @@ namespace ShackleGear
             {
                 RegisterPearlUpdate(player);
             };
-
-            serverHarmony.PatchAll();
-        }
-
-        public override void StartClientSide(ICoreClientAPI api)
-        {
-            clientHarmony = new Harmony(clientHarmonyId);
-
-            clientHarmony.PatchAll();
         }
 
         public void RegisterPearlUpdate(IServerPlayer player)
