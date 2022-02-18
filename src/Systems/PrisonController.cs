@@ -18,6 +18,13 @@ namespace ShackleGear.Controllers
             this.sapi = sapi;
         }
 
+        public BlockPos GetShacklePos(string uid)
+        {
+            var tracker = sapi.ModLoader.GetModSystem<ShackleGearTracker>();
+            var dat = tracker.GetTrackData(uid);
+            return dat?.trackData.LastPos;
+        }
+
         public bool FreePlayer(string uid, ItemSlot slot, bool destroy = true, BlockPos brokenAt = null)
         {
             if (sapi == null) return false;

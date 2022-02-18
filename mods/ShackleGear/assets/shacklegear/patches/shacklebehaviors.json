@@ -6,25 +6,5 @@
             "code": "gearfinder"
         },
         "file": "game:entities/humanoid/player.json"
-    },
-    { 
-        "op": "add", "path": "/entityBehaviors", "value": [ { "name": "gearfinder" } ],
-        "file": "game:blocktypes/wood/chest.json"
-    },
-    { 
-        "op": "add", "path": "/entityBehaviors", "value": [ { "name": "gearfinder" } ],
-        "file": "game:blocktypes/wood/chest-labeled.json"
-    },
-    { 
-        "op": "add", "path": "/entityBehaviors", "value": [ { "name": "gearfinder" } ],
-        "file": "game:blocktypes/wood/chest-trunk.json"
-    },
-    { 
-        "op": "add", "path": "/entityBehaviors", "value": [ { "name": "gearfinder" } ],
-        "file": "game:blocktypes/wood/stationarybasket.json"
-    },
-    { 
-        "op": "add", "path": "/entityBehaviors", "value": [ { "name": "gearfinder" } ],
-        "file": "game:blocktypes/clay/storagevessel.json"
     }
 ]

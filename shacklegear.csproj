@@ -33,6 +33,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\Lib\0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Lib\Newtonsoft.Json.dll</HintPath>
@@ -78,7 +82,7 @@
     <Compile Include="src\Systems\Commands\SGXFree.cs" />
     <Compile Include="src\Systems\Commands\SGXShackle.cs" />
     <Compile Include="src\EntityBehaviors\EntityBehaviorGearFinder.cs" />
-    <Compile Include="src\BlockEntityBehaviors\BEBehaviorGearFinder..cs" />
+    <Compile Include="src\Systems\Patches\BEBehaviorGearFinder..cs" />
     <Compile Include="src\Systems\PrisonController.cs" />
     <Compile Include="src\Systems\TrackData.cs" />
     <Compile Include="src\Systems\Tracker.cs" />

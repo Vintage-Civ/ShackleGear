@@ -12,7 +12,7 @@ namespace ShackleGear
         public void RegisterClasses(ICoreAPI api)
         {
             api.RegisterItemClass("shackleitem", typeof(ItemShackleGear));
-            api.RegisterBlockEntityBehaviorClass("gearfinder", typeof(BEBehaviorGearFinder));
+            //api.RegisterBlockEntityBehaviorClass("gearfinder", typeof(BEBehaviorGearFinder));
             api.RegisterEntityBehaviorClass("gearfinder", typeof(EntityBehaviorGearFinder));
         }
 
@@ -20,7 +20,7 @@ namespace ShackleGear
         {
             api.RegisterCommand("sgfree", "Frees a shackled player if you're holding a shackle", "/sgfree", new SGFree(api).Handler);
             api.RegisterCommand("sggetuid", "Displays the PlayerUID for a given name", "/sggetuid name", new SGGetUID(api).Handler );
-            api.RegisterCommand("sglocate", "Displays the location of your shackle gear, if you're shackled", "/sglocate", new SGLocate().Handler);
+            api.RegisterCommand("sglocate", "Displays the location of your shackle gear, if you're shackled", "/sglocate", new SGLocate(Prison).Handler);
             api.RegisterCommand("sgwho", "Displays the name of the player in a held shackle", "/sgwho", new SGWho().Handler);
             api.RegisterCommand("sgdebug", "Debug command for shackle-gear", "/sgdebug", new SGDebug().Handler);
             api.RegisterCommand("sgfuellog", "Shows who last fueled your shackle-gear", "/sgfuellog", new SGFuelLog(api).Handler);

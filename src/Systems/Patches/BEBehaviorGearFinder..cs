@@ -10,26 +10,24 @@ using Vintagestory.API.Server;
 using ShackleGear.Datasource;
 using ShackleGear.Items;
 using Vintagestory.API.Datastructures;
+using HarmonyLib;
+using Vintagestory.GameContent;
 
 namespace ShackleGear.BlockEntityBehaviors
 {
-    class BEBehaviorGearFinder : BlockEntityBehavior
+    [HarmonyPatch(typeof(BlockEntityGenericTypedContainer), "Initialize")]
+    class PatchContainers
     {
-        BlockPos Pos { get => Blockentity.Pos; }
-        ShackleGearTracker Tracker { get => Api.ModLoader.GetModSystem<ShackleGearTracker>(); }
-
-        public BEBehaviorGearFinder(BlockEntity blockentity) : base(blockentity)
+        public static void Postfix(BlockEntityGenericTypedContainer __instance, ICoreAPI api)
         {
-        }
-
-        public override void Initialize(ICoreAPI api, JsonObject properties)
-        {
-            base.Initialize(api, properties);
             if (!api.Side.IsServer()) return;
 
-            Blockentity.RegisterGameTickListener(dt =>
+            BlockPos Pos = __instance.Pos;
+            ShackleGearTracker Tracker = __instance.Api.ModLoader.GetModSystem<ShackleGearTracker>();
+
+            __instance.RegisterGameTickListener(dt =>
             {
-                (Blockentity as IBlockEntityContainer)?.Inventory.All(slot =>
+                __instance?.Inventory.All(slot =>
                 {
                     if (slot.Itemstack?.Item is ItemShackleGear)
                     {
