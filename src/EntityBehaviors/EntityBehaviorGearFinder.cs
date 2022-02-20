@@ -10,8 +10,8 @@ namespace ShackleGear.EntityBehaviors
 {
     class EntityBehaviorGearFinder : EntityBehavior
     {
-        BlockPos Pos { get => entity.Pos.AsBlockPos; }
-        ShackleGearTracker Tracker { get => entity.Api.ModLoader.GetModSystem<ShackleGearTracker>(); }
+        BlockPos Pos { get => entity?.Pos.AsBlockPos; }
+        ShackleGearTracker Tracker { get => entity?.Api.ModLoader.GetModSystem<ShackleGearTracker>(); }
         long id;
 
         public EntityBehaviorGearFinder(Entity entity) : base(entity)
@@ -35,8 +35,8 @@ namespace ShackleGear.EntityBehaviors
                         string uid = slot.Itemstack.Attributes.GetString("pearled_uid");
                         if (uid != null)
                         {
-                            FullTrackData data = Tracker.GetTrackData(uid);
-                            if (data.trackData != null)
+                            FullTrackData data = Tracker?.GetTrackData(uid);
+                            if (data?.trackData != null && Pos != null)
                             {
                                 data.trackData.SetLocation(Pos);
                                 data.trackData.SlotReference.InventoryID = slot.Inventory.InventoryID;
@@ -47,7 +47,7 @@ namespace ShackleGear.EntityBehaviors
                     }
                     return true;
                 });
-                Tracker.SaveTrackToDB();
+                Tracker?.SaveTrackToDB();
             }, 500);
         }
 

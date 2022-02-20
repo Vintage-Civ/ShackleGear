@@ -4,6 +4,6 @@
   "name": "shacklegear",
   "authors": [ "SimpleBastard", "Novocain" ],
   "description": "Allows players to imprison other players with Shackle Gears.",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "side": "universal"
 }

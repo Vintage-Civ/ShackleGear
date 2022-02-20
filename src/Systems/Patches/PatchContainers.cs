@@ -35,7 +35,7 @@ namespace ShackleGear.BlockEntityBehaviors
                         string uid = slot.Itemstack.Attributes.GetString("pearled_uid");
                         if (uid != null)
                         {
-                            FullTrackData data = Tracker.GetTrackData(uid);
+                            FullTrackData data = Tracker?.GetTrackData(uid);
                             if (data != null)
                             {
                                 data.trackData.SetLocation(Pos);
@@ -46,7 +46,7 @@ namespace ShackleGear.BlockEntityBehaviors
                     }
                     return true;
                 });
-                Tracker.SaveTrackToDB();
+                Tracker?.SaveTrackToDB();
             }, 500);
         }
     }

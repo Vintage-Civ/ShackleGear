@@ -10,8 +10,7 @@ namespace ShackleGear.Datasource
 {
     public class ShackleGearTracker : ModSystem
     {
-        public List<FullTrackData> FullTracked { get; set; } = new List<FullTrackData>();
-        public List<TrackData> Tracked { get; set; } = new List<TrackData>();
+        public Dictionary<string, TrackData> TrackedByUID { get; set; } = new Dictionary<string, TrackData>();
 
         ICoreServerAPI sapi;
 
@@ -26,56 +25,34 @@ namespace ShackleGear.Datasource
 
         public void AddItemToTrack(TrackData item)
         {
-            Tracked.Add(item);
-            FullTracked.Add(new FullTrackData(item, sapi));
-
+            TrackedByUID[item.PrisonerUID] = item;
             SaveTrackToDB();
         }
 
         public FullTrackData GetTrackData(string prisoneruid)
         {
-            foreach (var val in FullTracked)
-            {
-                if (val.trackData?.PrisonerUID == prisoneruid)
-                {
-                    return val;
-                }
-            }
-            return null;
+            TrackedByUID.TryGetValue(prisoneruid, out TrackData trackData);
+            if (trackData == null) return null;
+
+            return new FullTrackData(trackData, sapi);
         }
 
-        public bool RemoveItemFromTrack(IServerPlayer prisoner)
+        public bool IsShackled(IServerPlayer player)
         {
-            bool found = false;
-            TrackData trackeditem = null;
-            FullTrackData fulltrackeditem = null;
+            return TrackedByUID.ContainsKey(player.PlayerUID);
+        }
 
-            foreach (var val in Tracked)
+        public bool TryRemoveItemFromTrack(IServerPlayer prisoner)
+        {
+            FullTrackData fulltrackeditem = GetTrackData(prisoner.PlayerUID);
+            if (fulltrackeditem != null)
             {
-                if (val.PrisonerUID == prisoner.PlayerUID)
-                {
-                    trackeditem = val;
-                    found = true;
-                    break;
-                }
+                fulltrackeditem.MarkUnloadable();
+                TrackedByUID.Remove(prisoner.PlayerUID);
             }
-            if (found) Tracked.Remove(trackeditem);
-            found = false;
-
-            foreach (var val in FullTracked)
-            {
-                if (val.trackData?.PrisonerUID == null || val.trackData?.PrisonerUID == prisoner.PlayerUID)
-                {
-                    fulltrackeditem = val;
-                    val.MarkUnloadable();
-                    found = true;
-                    break;
-                }
-            }
-            if (found) FullTracked.Remove(fulltrackeditem);
 
             SaveTrackToDB();
-            return found;
+            return fulltrackeditem != null;
         }
 
         public void LoadTrackFromDB()
@@ -83,10 +60,10 @@ namespace ShackleGear.Datasource
             byte[] data = sapi.WorldManager.SaveGame.GetData("shacklegear_trackdata");
             if (data != null)
             {
-                Tracked = JsonUtil.FromBytes<List<TrackData>>(data);
+                var Tracked = JsonUtil.FromBytes<List<TrackData>>(data);
                 foreach (var val in Tracked)
                 {
-                    FullTracked.Add(new FullTrackData(val, sapi));
+                    TrackedByUID[val.PrisonerUID] = val;
                 }
             }
             else SaveTrackToDB();
@@ -94,7 +71,7 @@ namespace ShackleGear.Datasource
 
         public void SaveTrackToDB()
         {
-            sapi.WorldManager.SaveGame.StoreData("shacklegear_trackdata", JsonUtil.ToBytes(Tracked));
+            sapi.WorldManager.SaveGame.StoreData("shacklegear_trackdata", JsonUtil.ToBytes(TrackedByUID.Values.ToList()));
         }
     }
 }

@@ -56,7 +56,7 @@ namespace ShackleGear.Controllers
                     slot.MarkDirty();
                 }
 
-                sapi.ModLoader.GetModSystem<ShackleGearTracker>().RemoveItemFromTrack(serverPlayer);
+                sapi.ModLoader.GetModSystem<ShackleGearTracker>().TryRemoveItemFromTrack(serverPlayer);
                 sapi.Event.UnregisterGameTickListener(sapi.ModLoader.GetModSystem<ModSystemShackleGear>().TrackerIDs[uid]);
 
                 return true;
@@ -113,12 +113,17 @@ namespace ShackleGear.Controllers
         public bool TryImprisonPlayer(IServerPlayer prisoner, IServerPlayer killer, ItemSlot slot)
         {
             //imprison some player
+
             ITreeAttribute attribs = slot?.Itemstack?.Attributes;
 #if DEBUG
             sapi.Server.Logger.Debug(string.Format("[SHACKLE-GEAR] Imprison Function Fired, Call Stack: {0}", Environment.StackTrace));
 #endif
             if (attribs == null) return false;
             long ms = DateTime.UtcNow.Ticks;
+
+            var tracker = sapi.ModLoader.GetModSystem<ShackleGearTracker>();
+            
+            if (tracker.IsShackled(prisoner)) return false;
 
             attribs.SetString("pearled_uid", prisoner.PlayerUID);
             attribs.SetString("pearled_name", prisoner.PlayerName);
@@ -128,9 +133,9 @@ namespace ShackleGear.Controllers
             var vec = prisoner.Entity.ServerPos.XYZ;
             prisoner.SetSpawnPosition(new PlayerSpawnPos() { x = vec.XInt, y = vec.YInt, z = vec.ZInt});
 
-            if (!sapi.ModLoader.GetModSystem<ShackleGearTracker>().RemoveItemFromTrack(prisoner))
+            if (!tracker.TryRemoveItemFromTrack(prisoner))
             {
-                sapi.ModLoader.GetModSystem<ShackleGearTracker>().AddItemToTrack(new TrackData(GenSlotReference(slot), killer.Entity.ServerPos.AsBlockPos, prisoner.PlayerUID, killer.PlayerUID, killer.PlayerUID));
+                tracker.AddItemToTrack(new TrackData(GenSlotReference(slot), killer.Entity.ServerPos.AsBlockPos, prisoner.PlayerUID, killer.PlayerUID, killer.PlayerUID));
             }
 
             sapi.ModLoader.GetModSystem<ModSystemShackleGear>().RegisterPearlUpdate(prisoner);

@@ -22,7 +22,6 @@ namespace ShackleGear.Items
         private double maxSeconds;
         public PrisonController Prsn { get => api.ModLoader.GetModSystem<ModSystemShackleGear>().Prison; }
         public ShackleGearTracker Tracker { get => api.ModLoader.GetModSystem<ShackleGearTracker>(); }
-        public List<TrackData> Tracked { get => Tracker.Tracked; }
 
         public override void OnLoaded(ICoreAPI api)
         {
