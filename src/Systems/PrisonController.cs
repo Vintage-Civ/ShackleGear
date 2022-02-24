@@ -6,28 +6,34 @@ using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
 using ShackleGear.Datasource;
 using System;
+using Vintagestory.API.Common.Entities;
+using Vintagestory.Server;
+using Vintagestory.Common;
+using Vintagestory.API.Util;
 
 namespace ShackleGear.Controllers
 {
     public class PrisonController
     {
         private ICoreServerAPI sapi;
-
+        ShackleGearTracker tracker;
+        ModSystemShackleGear shackleGear;
         public PrisonController(ICoreServerAPI sapi)
         {
             this.sapi = sapi;
+            tracker = sapi.ModLoader.GetModSystem<ShackleGearTracker>();
+            shackleGear = sapi.ModLoader.GetModSystem<ModSystemShackleGear>();
         }
 
         public BlockPos GetShacklePos(string uid)
         {
-            var tracker = sapi.ModLoader.GetModSystem<ShackleGearTracker>();
             var dat = tracker.GetTrackData(uid);
             return dat?.LastPos;
         }
 
-        public bool FreePlayer(string uid, ItemSlot slot, bool destroy = true, BlockPos brokenAt = null)
+        public void FreePlayer(string uid, ItemSlot slot, bool destroy = true, BlockPos brokenAt = null)
         {
-            if (sapi == null) return false;
+            if (sapi == null) return;
 #if DEBUG
             sapi.Server.Logger.Debug(string.Format("[SHACKLE-GEAR] Free Function Fired, Call Stack: {0}", Environment.StackTrace));
 #endif
@@ -35,33 +41,60 @@ namespace ShackleGear.Controllers
             IServerPlayer serverPlayer = sapi.World.PlayerByUid(uid) as IServerPlayer;
             if (serverPlayer != null)
             {
-                sapi.Permissions.SetRole(serverPlayer, "suplayer");
-                ITreeAttribute attribs = slot?.Itemstack?.Attributes;
+                serverPlayer.SendMessage(GlobalConstants.GeneralChatGroup, "You've been freed!", EnumChatType.Notification);
+            }
+
+            var playerDat = sapi.PlayerData.GetPlayerDataByUid(uid) as ServerPlayerData;
+            playerDat.SetRole((sapi.World as ServerMain).Config.RolesByCode["suplayer"]);
+
+            ITreeAttribute attribs = slot?.Itemstack?.Attributes;
+
+            if (attribs != null)
+            {
                 var vec = GetSpawnFromAttributes(attribs);
 
-                if (attribs != null) serverPlayer.SetSpawnPosition(new PlayerSpawnPos() { x = (int)vec.X, y = (int)vec.Y, z = (int)vec.Z });
+                var server = sapi.World as ServerMain;
+                var worldData = server.GetWorldPlayerData(uid) as ServerWorldPlayerData;
 
-                serverPlayer.SendMessage(GlobalConstants.GeneralChatGroup, "You've been freed!", EnumChatType.Notification);
-                if (slot != null)
+                if (worldData != null)
                 {
-                    if (destroy)
-                    {
-                        if (brokenAt != null)
-                        {
-                            sapi.World.PlaySoundAt(new AssetLocation("sounds/block/glass"), brokenAt.X + 0.5, brokenAt.Y, brokenAt.Z + 0.5);
-                            sapi.World.SpawnCubeParticles(brokenAt.ToVec3d().Add(0.5, 0, 0.5), slot.Itemstack, 1, 32);
-                        }
-                        slot.TakeOutWhole();
-                    }
-                    slot.MarkDirty();
+                    worldData.SpawnPosition = new PlayerSpawnPos() { x = (int)vec.X, y = (int)vec.Y, z = (int)vec.Z };
                 }
+                else
+                {
+                    byte[] data = server.GetField<ChunkServerThread>("chunkThread").GetField<GameDatabase>("gameDatabase").GetPlayerData(uid);
+                    if (data != null)
+                    {
+                        worldData = SerializerUtil.Deserialize<ServerWorldPlayerData>(data);
+                        worldData.Init(server);
 
-                sapi.ModLoader.GetModSystem<ShackleGearTracker>().TryRemoveItemFromTrack(serverPlayer);
-                sapi.Event.UnregisterGameTickListener(sapi.ModLoader.GetModSystem<ModSystemShackleGear>().TrackerIDs[uid]);
+                        worldData.SpawnPosition = new PlayerSpawnPos() { x = (int)vec.X, y = (int)vec.Y, z = (int)vec.Z };
 
-                return true;
+                        server.PlayerDataManager.WorldDataByUID[uid] = worldData;
+                    }
+                }
             }
-            return false;
+
+            if (slot != null)
+            {
+                if (destroy)
+                {
+                    if (brokenAt != null)
+                    {
+                        sapi.World.PlaySoundAt(new AssetLocation("sounds/block/glass"), brokenAt.X + 0.5, brokenAt.Y, brokenAt.Z + 0.5);
+                        sapi.World.SpawnCubeParticles(brokenAt.ToVec3d().Add(0.5, 0, 0.5), slot.Itemstack, 1, 32);
+                    }
+                    slot.TakeOutWhole();
+                }
+                slot.MarkDirty();
+            }
+
+            tracker.TryRemoveItemFromTrack(uid);
+            if (shackleGear.TrackerIDs.ContainsKey(uid))
+            {
+                sapi.Event.UnregisterGameTickListener(shackleGear.TrackerIDs[uid]);
+            }
+            ClearCellSpawn(uid);
         }
 
         public void MovePlayer(string uid, BlockPos pos)
@@ -73,9 +106,29 @@ namespace ShackleGear.Controllers
             }
         }
 
+        public void MoveToCell(Entity entity)
+        {
+            string uid = ((entity as EntityPlayer)?.Player as IServerPlayer)?.PlayerUID;
+
+            MovePlayer(uid, GetCellSpawn(entity));
+        }
+
         public void MoveToCell(string uid)
         {
+            if (uid == null) return;
+
             MovePlayer(uid, GetCellSpawn(uid));
+        }
+
+        public void ClearCellSpawn(string uid)
+        {
+            IServerPlayer serverPlayer = sapi.World.PlayerByUid(uid) as IServerPlayer;
+            if (serverPlayer != null)
+            {
+                serverPlayer.Entity.WatchedAttributes.RemoveAttribute("shackled_cellX");
+                serverPlayer.Entity.WatchedAttributes.RemoveAttribute("shackled_cellY");
+                serverPlayer.Entity.WatchedAttributes.RemoveAttribute("shackled_cellZ");
+            }
         }
 
         public void SetCellSpawn(string uid, BlockPos pos)
@@ -87,11 +140,16 @@ namespace ShackleGear.Controllers
             }
         }
 
+        public BlockPos GetCellSpawn(Entity entity)
+        {
+            return entity?.WatchedAttributes?.GetVec3i("shackled_cell")?.AsBlockPos;
+        }
+
         public BlockPos GetCellSpawn(string uid)
         {
             IServerPlayer serverPlayer = sapi.World.PlayerByUid(uid) as IServerPlayer;
-            
-            return serverPlayer?.Entity?.WatchedAttributes?.GetVec3i("shackled_cell")?.AsBlockPos;
+
+            return GetCellSpawn(serverPlayer?.Entity);
         }
 
         public void SetSpawnInAttributes(ITreeAttribute attribs, IServerPlayer player)

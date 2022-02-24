@@ -5,17 +5,23 @@ using Vintagestory.API.MathTools;
 using ShackleGear.Datasource;
 using ShackleGear.Items;
 using Vintagestory.API.Datastructures;
+using ShackleGear.Controllers;
+using Vintagestory.API.Server;
 
 namespace ShackleGear.EntityBehaviors
 {
     class EntityBehaviorGearFinder : EntityBehavior
     {
         BlockPos Pos { get => entity?.Pos.AsBlockPos; }
-        ShackleGearTracker Tracker { get => entity?.Api.ModLoader.GetModSystem<ShackleGearTracker>(); }
+        ShackleGearTracker Tracker;
+        PrisonController Prison;
+
         long id;
 
         public EntityBehaviorGearFinder(Entity entity) : base(entity)
         {
+            Prison = entity?.Api.ModLoader.GetModSystem<ModSystemShackleGear>().Prison;
+            Tracker = entity?.Api.ModLoader.GetModSystem<ShackleGearTracker>();
         }
 
         public override string PropertyName() => "gearfinder";
@@ -49,6 +55,13 @@ namespace ShackleGear.EntityBehaviors
                 });
                 Tracker?.SaveTrackToDB();
             }, 500);
+            
+            entity.WatchedAttributes.RegisterModifiedListener("entityDead", () => {
+                if (Tracker.IsShackled(entity))
+                {
+                    Prison.MoveToCell(entity);
+                }
+            });
         }
 
         public override void OnEntityDespawn(EntityDespawnReason despawn)

@@ -5,6 +5,7 @@ using ShackleGear.Controllers;
 using System.Linq;
 using Vintagestory.API.Util;
 using Newtonsoft.Json;
+using Vintagestory.API.Common.Entities;
 
 namespace ShackleGear.Datasource
 {
@@ -49,22 +50,36 @@ namespace ShackleGear.Datasource
             return new FullTrackData(trackData, sapi);
         }
 
+        public bool IsShackled(Entity entity)
+        {
+            return IsShackled((entity as EntityPlayer)?.Player as IServerPlayer);
+        }
+
         public bool IsShackled(IServerPlayer player)
         {
+            if (player == null) return false;
+
             return TrackedByUID.ContainsKey(player.PlayerUID);
+        }
+
+        public bool TryRemoveItemFromTrack(string uid)
+        {
+            FullTrackData fulltrackeditem = GetTrackData(uid);
+            if (fulltrackeditem != null)
+            {
+                fulltrackeditem.MarkUnloadable();
+                TrackedByUID.Remove(uid);
+                SaveTrackToDB();
+                return true;
+            }
+            SaveTrackToDB();
+            
+            return false;
         }
 
         public bool TryRemoveItemFromTrack(IServerPlayer prisoner)
         {
-            FullTrackData fulltrackeditem = GetTrackData(prisoner.PlayerUID);
-            if (fulltrackeditem != null)
-            {
-                fulltrackeditem.MarkUnloadable();
-                TrackedByUID.Remove(prisoner.PlayerUID);
-            }
-
-            SaveTrackToDB();
-            return fulltrackeditem != null;
+            return TryRemoveItemFromTrack(prisoner.PlayerUID);
         }
 
         public void LoadTrackFromDB()
