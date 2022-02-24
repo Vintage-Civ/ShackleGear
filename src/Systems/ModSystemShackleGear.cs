@@ -48,7 +48,7 @@ namespace ShackleGear
         public void RegisterPearlUpdate(IServerPlayer player)
         {
             FullTrackData data = Tracker.GetTrackData(player.PlayerUID);
-            BlockPos pos = data?.trackData?.LastPos;
+            BlockPos pos = data?.LastPos;
 
             if (pos != null && player?.PlayerUID != null)
             {

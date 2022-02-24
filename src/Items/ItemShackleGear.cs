@@ -104,19 +104,25 @@ namespace ShackleGear.Items
                     }
                     else
                     {
+                        double currentfuel = attribs.GetDouble("pearled_fuel");
                         foreach (var invSlot in slot.Inventory)
                         {
-                            if (invSlot?.Itemstack?.Collectible?.CombustibleProps != null)
-                            {
-                                if (invSlot.Itemstack.Collectible.CombustibleProps.BurnTemperature < 1000) break;
-                                double currentfuel = attribs.GetDouble("pearled_fuel");
-                                if (currentfuel > maxSeconds) break;
+                            if (currentfuel > maxSeconds) break;
 
-                                attribs.SetDouble("pearled_fuel", currentfuel + (invSlot.Itemstack.Collectible.CombustibleProps.BurnDuration * fuelMult));
+                            var cobj = invSlot?.Itemstack?.Collectible;
+
+                            if (cobj?.CombustibleProps != null)
+                            {
+                                if (cobj.CombustibleProps.BurnTemperature < 1000) continue;
+
+                                attribs.SetDouble("pearled_fuel", currentfuel + (cobj.CombustibleProps.BurnDuration * fuelMult));
                                 invSlot.TakeOut(1);
                                 invSlot.MarkDirty();
                                 slot.MarkDirty();
-                                if (attribs.GetString("pearled_uid") != null) Tracker.GetTrackData(attribs.GetString("pearled_uid")).trackData.LastFuelerUID = (byEntity as EntityPlayer).PlayerUID;
+                                if (attribs.GetString("pearled_uid") != null)
+                                {
+                                    Tracker.SetLastFuelerUID(attribs.GetString("pearled_uid"), (byEntity as EntityPlayer).PlayerUID);
+                                }
                                 break;
                             }
                         }

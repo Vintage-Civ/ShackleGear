@@ -22,7 +22,7 @@ namespace ShackleGear.Controllers
         {
             var tracker = sapi.ModLoader.GetModSystem<ShackleGearTracker>();
             var dat = tracker.GetTrackData(uid);
-            return dat?.trackData.LastPos;
+            return dat?.LastPos;
         }
 
         public bool FreePlayer(string uid, ItemSlot slot, bool destroy = true, BlockPos brokenAt = null)

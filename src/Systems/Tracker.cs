@@ -29,6 +29,18 @@ namespace ShackleGear.Datasource
             SaveTrackToDB();
         }
 
+        public void SetLastFuelerUID(string shackledUID, string fuelerUID)
+        {
+            if (GetTrackData(shackledUID) == null) return;
+
+            GetTrackData(shackledUID).LastFuelerUID = fuelerUID;
+        }
+
+        public string GetLastFuelerUID(string shackledUID)
+        {
+            return GetTrackData(shackledUID)?.LastFuelerUID;
+        }
+
         public FullTrackData GetTrackData(string prisoneruid)
         {
             TrackedByUID.TryGetValue(prisoneruid, out TrackData trackData);

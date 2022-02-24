@@ -36,12 +36,12 @@ namespace ShackleGear.EntityBehaviors
                         if (uid != null)
                         {
                             FullTrackData data = Tracker?.GetTrackData(uid);
-                            if (data?.trackData != null && Pos != null)
+                            if (!data.IsNull && Pos != null)
                             {
-                                data.trackData.SetLocation(Pos);
-                                data.trackData.SlotReference.InventoryID = slot.Inventory.InventoryID;
-                                data.trackData.SlotReference.SlotID = slot.Inventory.GetSlotId(slot);
-                                data.trackData.LastHolderUID = ((EntityPlayer)entity).PlayerUID;
+                                data.SetLocation(Pos);
+                                data.SlotReference.InventoryID = slot.Inventory.InventoryID;
+                                data.SlotReference.SlotID = slot.Inventory.GetSlotId(slot);
+                                data.LastHolderUID = ((EntityPlayer)entity).PlayerUID;
                             }
                         }   
                     }

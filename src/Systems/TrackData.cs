@@ -15,15 +15,33 @@ namespace ShackleGear.Datasource
             this.api = api;
         }
 
-        public TrackData trackData;
+        private TrackData trackData;
         private ICoreServerAPI api;
 
         public ItemStack ItemStack { get => Slot?.Itemstack; }
-        public IServerPlayer Prisoner { get => (IServerPlayer)api.World.PlayerByUid(trackData.PrisonerUID); }
-        public IServerPlayer LastHolder { get => (IServerPlayer)api.World.PlayerByUid(trackData.LastHolderUID); }
+        public IServerPlayer Prisoner { get => (IServerPlayer)api.World.PlayerByUid(PrisonerUID); }
+        public IServerPlayer LastHolder { get => (IServerPlayer)api.World.PlayerByUid(LastHolderUID); }
         public Vec3i LastChunkPos { get => new Vec3i(trackData.LastPos.X / Chunksize, trackData.LastPos.Y / Chunksize, trackData.LastPos.Z / Chunksize) ?? null; }
         private int Chunksize { get => api.World.BlockAccessor.ChunkSize; }
         public bool IsChunkForceLoaded { get; private set; }
+
+        public SlotReference SlotReference { get => trackData.SlotReference; set => trackData.SlotReference = value; }
+        public BlockPos LastPos { get => trackData.LastPos; set => trackData.LastPos = value; }
+        public string PrisonerUID { get => trackData.PrisonerUID; set => trackData.PrisonerUID = value; }
+        public string LastHolderUID { get => trackData.LastHolderUID; set => trackData.LastHolderUID = value; }
+        public string LastFuelerUID { get => trackData.LastFuelerUID; set => trackData.LastFuelerUID = value; }
+
+        public bool IsNull { get => trackData == null; }
+
+        public void SetLocation(int x, int y, int z)
+        {
+            LastPos.X = x; LastPos.Y = y; LastPos.Z = z;
+        }
+
+        public void SetLocation(BlockPos pos)
+        {
+            SetLocation(pos.X, pos.Y, pos.Z);
+        }
 
         public ItemSlot Slot
         {

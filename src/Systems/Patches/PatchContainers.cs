@@ -38,9 +38,9 @@ namespace ShackleGear.BlockEntityBehaviors
                             FullTrackData data = Tracker?.GetTrackData(uid);
                             if (data != null)
                             {
-                                data.trackData.SetLocation(Pos);
-                                data.trackData.SlotReference.InventoryID = slot.Inventory.InventoryID;
-                                data.trackData.SlotReference.SlotID = slot.Inventory.GetSlotId(slot);
+                                data.SetLocation(Pos);
+                                data.SlotReference.InventoryID = slot.Inventory.InventoryID;
+                                data.SlotReference.SlotID = slot.Inventory.GetSlotId(slot);
                             }
                         }
                     }

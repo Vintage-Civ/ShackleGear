@@ -26,7 +26,7 @@ namespace ShackleGear.Commands
             var data = Tracker.GetTrackData(player.PlayerUID);
             if (data != null)
             {
-                string uid = data.trackData.LastFuelerUID;
+                string uid = data.LastFuelerUID;
                 if (uid != null) player.SendMessage(GlobalConstants.GeneralChatGroup, "The player who last fueled your shackle is: " + sapi.World.PlayerByUid(uid).PlayerName + " With the UID of: " + uid, EnumChatType.OwnMessage);
             }
             else
