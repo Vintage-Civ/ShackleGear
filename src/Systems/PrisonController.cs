@@ -65,12 +65,18 @@ namespace ShackleGear.Controllers
                     byte[] data = server.GetField<ChunkServerThread>("chunkThread").GetField<GameDatabase>("gameDatabase").GetPlayerData(uid);
                     if (data != null)
                     {
-                        worldData = SerializerUtil.Deserialize<ServerWorldPlayerData>(data);
-                        worldData.Init(server);
+                        try
+                        {
+                            worldData = SerializerUtil.Deserialize<ServerWorldPlayerData>(data);
+                            worldData.Init(server);
 
-                        worldData.SpawnPosition = new PlayerSpawnPos() { x = (int)vec.X, y = (int)vec.Y, z = (int)vec.Z };
+                            worldData.SpawnPosition = new PlayerSpawnPos() { x = (int)vec.X, y = (int)vec.Y, z = (int)vec.Z };
 
-                        server.PlayerDataManager.WorldDataByUID[uid] = worldData;
+                            server.PlayerDataManager.WorldDataByUID[uid] = worldData;
+                        }
+                        catch (Exception)
+                        {
+                        }
                     }
                 }
             }
