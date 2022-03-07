@@ -183,7 +183,7 @@ namespace ShackleGear.Controllers
             sapi.Server.Logger.Debug(string.Format("[SHACKLE-GEAR] Imprison Function Fired, Call Stack: {0}", Environment.StackTrace));
 #endif
             if (attribs == null) return false;
-            long ms = DateTime.UtcNow.Ticks;
+            long ticks = DateTime.UtcNow.Ticks;
 
             var tracker = sapi.ModLoader.GetModSystem<ShackleGearTracker>();
             
@@ -191,7 +191,7 @@ namespace ShackleGear.Controllers
 
             attribs.SetString("pearled_uid", prisoner.PlayerUID);
             attribs.SetString("pearled_name", prisoner.PlayerName);
-            attribs.SetLong("pearled_timestamp", ms);
+            attribs.SetLong("pearled_timestamp", ticks);
 
             SetSpawnInAttributes(attribs, prisoner);
             var vec = prisoner.Entity.ServerPos.XYZ;

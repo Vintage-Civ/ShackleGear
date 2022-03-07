@@ -29,7 +29,7 @@ namespace ShackleGear.BlockEntityBehaviors
             {
                 __instance?.Inventory.All(slot =>
                 {
-                    if (slot.Itemstack?.Item is ItemShackleGear)
+                    if (slot?.Itemstack?.Item is ItemShackleGear)
                     {
                         ((ItemShackleGear)slot.Itemstack.Item).UpdateFuelState(api.World, slot);
                         string uid = slot.Itemstack.Attributes.GetString("pearled_uid");

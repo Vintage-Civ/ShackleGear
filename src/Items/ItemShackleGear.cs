@@ -114,8 +114,10 @@ namespace ShackleGear.Items
                             if (cobj?.CombustibleProps != null)
                             {
                                 if (cobj.CombustibleProps.BurnTemperature < 1000) continue;
+                                double df = cobj.CombustibleProps.BurnTemperature / 1000.0 * cobj.CombustibleProps.BurnDuration;
+                                df *= fuelMult;
 
-                                attribs.SetDouble("pearled_fuel", currentfuel + (cobj.CombustibleProps.BurnDuration * fuelMult));
+                                attribs.SetDouble("pearled_fuel", currentfuel + df);
                                 invSlot.TakeOut(1);
                                 invSlot.MarkDirty();
                                 slot.MarkDirty();
@@ -166,26 +168,20 @@ namespace ShackleGear.Items
                 ITreeAttribute attribs = inSlot?.Itemstack?.Attributes;
                 if (attribs?.GetString("pearled_uid") != null)
                 {
-                    if (attribs.GetDouble("pearled_timestamp", -1.0) != -1.0)
+                    long dt = DateTime.UtcNow.Ticks - attribs.GetLong("pearled_lastping", DateTime.UtcNow.Ticks);
+                    double fuel = attribs.GetDouble("pearled_fuel", 0.0f);
+
+                    if (fuel < 0f)
                     {
-                        long ms = DateTime.UtcNow.Ticks;
-                        long dt = ms - attribs.GetLong("pearled_timestamp");
-                        double fuel = attribs.GetDouble("pearled_fuel", 0.0f);
-#if DEBUG
-                        world.Logger.Debug(string.Format("[SHACKLE-GEAR] Fuel Left On This Tick: {0} Units", Math.Round(fuel, 3)));
-                        world.Logger.Debug(string.Format("[SHACKLE-GEAR] TimeStamp: {0}", Math.Round(attribs.GetFloat("pearled_timestamp"), 3)));
-                        world.Logger.Debug(string.Format("[SHACKLE-GEAR] MS: {0}", ms));
-#endif
-                        if (fuel < 0f)
-                        {
-                            Prsn.FreePlayer(attribs.GetString("pearled_uid"), inSlot);
-                            attribs.SetLong("pearled_timestamp", -1);
-                        }
-                        else
-                        {
-                            attribs.SetDouble("pearled_fuel", fuel - (double)(dt / 10000000.0));
-                        }
+                        Prsn.FreePlayer(attribs.GetString("pearled_uid"), inSlot);
                     }
+                    else
+                    {
+                        TimeSpan span = new TimeSpan(dt);
+                        attribs.SetDouble("pearled_fuel", fuel - span.TotalSeconds);
+                    }
+
+                    attribs.SetLong("pearled_lastping", DateTime.UtcNow.Ticks);
                 }
                 inSlot.MarkDirty();
             }

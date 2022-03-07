@@ -38,7 +38,7 @@ namespace ShackleGear.EntityBehaviors
                     if (!(slot is ItemSlotCreative) && slot.Itemstack?.Item is ItemShackleGear)
                     {
                         ((ItemShackleGear)slot.Itemstack.Item).UpdateFuelState(entity.World, slot);
-                        string uid = slot.Itemstack.Attributes.GetString("pearled_uid");
+                        string uid = slot.Itemstack?.Attributes.GetString("pearled_uid");
                         if (uid != null)
                         {
                             FullTrackData data = Tracker?.GetTrackData(uid);
