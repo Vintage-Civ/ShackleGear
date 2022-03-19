@@ -10,6 +10,7 @@ using Vintagestory.API.Common.Entities;
 using Vintagestory.Server;
 using Vintagestory.Common;
 using Vintagestory.API.Util;
+using ShackleGear.Utility;
 
 namespace ShackleGear.Controllers
 {

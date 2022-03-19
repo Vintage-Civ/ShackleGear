@@ -12,6 +12,7 @@ using ShackleGear.Items;
 using ShackleGear.EntityBehaviors;
 using Vintagestory.API.Config;
 using HarmonyLib;
+using ShackleGear.Utility;
 
 namespace ShackleGear
 {
@@ -23,6 +24,7 @@ namespace ShackleGear
         public Dictionary<string, long> TrackerIDs = new Dictionary<string, long>();
         ShackleGearTracker Tracker { get => api.ModLoader.GetModSystem<ShackleGearTracker>(); }
         Type dummyPlayerType;
+        internal ShackleGearServerConfig shackleServerConfig;
 
         public override void Start(ICoreAPI api)
         {
@@ -48,6 +50,9 @@ namespace ShackleGear
             {
                 RegisterPearlUpdate(player);
             };
+
+            shackleServerConfig = new ShackleGearServerConfig(api);
+            shackleServerConfig.Load();
         }
 
         private void OnEntityDeath(Entity entity, DamageSource damageSource)
@@ -74,7 +79,7 @@ namespace ShackleGear
 
             if (pos != null && player?.PlayerUID != null)
             {
-                sapi.Permissions.SetRole(player, "suvisitor");
+                sapi.Permissions.SetRole(player, shackleServerConfig.ShackledGroup);
                 string uid = player.PlayerUID;
 
                 TrackerIDs[uid] = sapi.Event.RegisterGameTickListener(dt =>

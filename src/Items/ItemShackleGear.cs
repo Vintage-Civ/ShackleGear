@@ -11,6 +11,7 @@ using ShackleGear.Datasource;
 using System.Collections.Generic;
 using Vintagestory.Client.NoObf;
 using Vintagestory.GameContent;
+using ShackleGear.Utility;
 
 namespace ShackleGear.Items
 {
@@ -22,6 +23,8 @@ namespace ShackleGear.Items
         private double maxSeconds;
         public PrisonController Prsn { get => api.ModLoader.GetModSystem<ModSystemShackleGear>().Prison; }
         public ShackleGearTracker Tracker { get => api.ModLoader.GetModSystem<ShackleGearTracker>(); }
+
+        internal ShackleGearServerConfig Config { get => api.ModLoader.GetModSystem<ModSystemShackleGear>().shackleServerConfig; }
 
         public override void OnLoaded(ICoreAPI api)
         {
@@ -116,6 +119,7 @@ namespace ShackleGear.Items
                                 if (cobj.CombustibleProps.BurnTemperature < 1000) continue;
                                 double df = cobj.CombustibleProps.BurnTemperature / 1000.0 * cobj.CombustibleProps.BurnDuration;
                                 df *= fuelMult;
+                                df *= Config.ShackleBurnMulRO;
 
                                 attribs.SetDouble("pearled_fuel", currentfuel + df);
                                 invSlot.TakeOut(1);

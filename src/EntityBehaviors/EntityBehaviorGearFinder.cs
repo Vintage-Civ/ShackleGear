@@ -42,7 +42,7 @@ namespace ShackleGear.EntityBehaviors
                         if (uid != null)
                         {
                             FullTrackData data = Tracker?.GetTrackData(uid);
-                            if (!data.IsNull && Pos != null)
+                            if (data != null && !data.IsNull && Pos != null)
                             {
                                 data.SetLocation(Pos);
                                 data.SlotReference.InventoryID = slot.Inventory.InventoryID;
