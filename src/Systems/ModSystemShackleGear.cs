@@ -11,6 +11,7 @@ using ShackleGear.Datasource;
 using ShackleGear.Items;
 using ShackleGear.EntityBehaviors;
 using Vintagestory.API.Config;
+using HarmonyLib;
 
 namespace ShackleGear
 {
@@ -21,6 +22,7 @@ namespace ShackleGear
         ICoreServerAPI sapi;
         public Dictionary<string, long> TrackerIDs = new Dictionary<string, long>();
         ShackleGearTracker Tracker { get => api.ModLoader.GetModSystem<ShackleGearTracker>(); }
+        Type dummyPlayerType;
 
         public override void Start(ICoreAPI api)
         {
@@ -35,6 +37,9 @@ namespace ShackleGear
             Prison = new PrisonController(sapi);
             RegisterServerCommands(sapi);
 
+            dummyPlayerType = AccessTools.TypeByName("dummyplayer.src.EntityClonePlayer");
+
+            api.Event.OnEntityDeath += OnEntityDeath;
             api.Event.PlayerDeath += OnPlayerDeath;
             api.Event.PlayerDisconnect += EventOnPlayerDisconnect;
             api.Event.OnEntityDespawn += EventOnOnEntityDespawn;
@@ -43,6 +48,23 @@ namespace ShackleGear
             {
                 RegisterPearlUpdate(player);
             };
+        }
+
+        private void OnEntityDeath(Entity entity, DamageSource damageSource)
+        {
+            if (entity is EntityPlayer entityPlayer)
+            {
+                OnPlayerDeath((IServerPlayer)entityPlayer.Player, damageSource);
+            }
+
+            if (dummyPlayerType != null)
+            {
+                if (entity.GetType() == dummyPlayerType)
+                {
+                    var player = (IServerPlayer)sapi.World.PlayerByUid(entity.GetField<string>("sourceEntityUID"));
+                    OnPlayerDeath(player, damageSource);
+                }
+            }
         }
 
         public void RegisterPearlUpdate(IServerPlayer player)
