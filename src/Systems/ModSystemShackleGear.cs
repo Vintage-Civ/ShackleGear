@@ -136,10 +136,11 @@ namespace ShackleGear
             }
         }
 
-        public void EventOnOnEntityDespawn(Entity entity, EntityDespawnReason reason)
+        public void EventOnOnEntityDespawn(Entity entity, EntityDespawnData data)
         {
             
         }
+
 
         public void EventOnPlayerDisconnect(IServerPlayer byplayer)
         {

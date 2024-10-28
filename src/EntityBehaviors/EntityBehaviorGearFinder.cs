@@ -64,7 +64,7 @@ namespace ShackleGear.EntityBehaviors
             });
         }
 
-        public override void OnEntityDespawn(EntityDespawnReason despawn)
+        public override void OnEntityDespawn(EntityDespawnData despawn)
         {
             base.OnEntityDespawn(despawn);
             entity.World.UnregisterGameTickListener(id);

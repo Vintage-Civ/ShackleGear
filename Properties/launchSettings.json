@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "ShackleGear": {
+      "commandName": "Project",
+      "commandLineArgs": "--addModPath=\"C:\\Games\\Vintagestory\\Modding\\ShackleGear\\mods\" --dataPath=\"C:\\Games\\Vintagestory\\ModDevData\"",
+      "workingDirectory": "C:\\Games\\Vintagestory\\1.20.X"
+    }
+  }
+}
