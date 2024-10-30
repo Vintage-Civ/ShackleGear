@@ -12,11 +12,11 @@ namespace ShackleGear.EntityBehaviors
 {
     class EntityBehaviorGearFinder : EntityBehavior
     {
-        BlockPos Pos { get => entity?.Pos.AsBlockPos; }
-        ShackleGearTracker Tracker;
-        PrisonController Prison;
+        public BlockPos Pos { get => entity?.Pos.AsBlockPos; }
+        public ShackleGearTracker Tracker;
+        public PrisonController Prison;
 
-        long id;
+        public long id;
 
         public EntityBehaviorGearFinder(Entity entity) : base(entity)
         {
@@ -35,10 +35,10 @@ namespace ShackleGear.EntityBehaviors
             {
                 (entity as EntityPlayer).WalkInventory(slot =>
                 {
-                    if (!(slot is ItemSlotCreative) && slot.Itemstack?.Item is ItemShackleGear)
+                    if (slot is not ItemSlotCreative && slot.Itemstack?.Item is ItemShackleGear)
                     {
                         ((ItemShackleGear)slot.Itemstack.Item).UpdateFuelState(entity.World, slot);
-                        string uid = slot.Itemstack?.Attributes.GetString("pearled_uid");
+                        string uid = slot.Itemstack?.Attributes.GetString("shackled_uid");
                         if (uid != null)
                         {
                             FullTrackData data = Tracker?.GetTrackData(uid);

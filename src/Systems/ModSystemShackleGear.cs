@@ -21,7 +21,7 @@ namespace ShackleGear
         public PrisonController Prison { get; private set; }
         ICoreAPI api;
         ICoreServerAPI sapi;
-        public Dictionary<string, long> TrackerIDs = new Dictionary<string, long>();
+        public Dictionary<string, long> TrackerIDs = new();
         ShackleGearTracker Tracker { get => api.ModLoader.GetModSystem<ShackleGearTracker>(); }
         Type dummyPlayerType;
         internal ShackleGearServerConfig shackleServerConfig;
@@ -46,10 +46,7 @@ namespace ShackleGear
             api.Event.PlayerDisconnect += EventOnPlayerDisconnect;
             api.Event.OnEntityDespawn += EventOnOnEntityDespawn;
 
-            api.Event.PlayerJoin += player =>
-            {
-                RegisterPearlUpdate(player);
-            };
+            api.Event.PlayerJoin += RegisterPearlUpdate;
 
             shackleServerConfig = new ShackleGearServerConfig(api);
             shackleServerConfig.Load();
@@ -95,13 +92,8 @@ namespace ShackleGear
                             }
                         }
                     }
-#pragma warning disable CS0168 // Variable is declared but never used
                     catch (Exception ex)
-#pragma warning restore CS0168 // Variable is declared but never used
                     {
-#if DEBUG
-                        sapi.World.Logger.Debug("[ShackleGear] Exception thrown: " + ex);
-#endif
                         data.MarkUnloadable();
                         sapi.Event.UnregisterGameTickListener(TrackerIDs[uid]);
                     }
@@ -112,23 +104,14 @@ namespace ShackleGear
 
         public void OnPlayerDeath(IServerPlayer byplayer, DamageSource damagesource)
         {
-#if DEBUG
-            sapi.World.Logger.Notification("[SHACKLEGEAR] Event Fired.");
-#endif
             if (damagesource?.SourceEntity is EntityPlayer)
             {
-#if DEBUG
-                sapi.World.Logger.Notification("[SHACKLEGEAR] Was EntityPlayer.");
-#endif
                 IPlayer killer = sapi.World.PlayerByUid(((EntityPlayer)damagesource.SourceEntity).PlayerUID);
                 killer.Entity.WalkInventory(slot =>
                 {
-                    if (slot?.Itemstack?.Item is ItemShackleGear && (slot?.Itemstack.Attributes.GetString("pearled_uid") == null))
+                    if (slot?.Itemstack?.Item is ItemShackleGear && (slot?.Itemstack.Attributes.GetString("shackled_uid") == null))
                     {
                         Prison.TryImprisonPlayer(byplayer, (IServerPlayer)killer, slot);
-#if DEBUG
-                        sapi.World.Logger.Notification("[SHACKLEGEAR] Gear Found.");
-#endif
                         return false;
                     }
                     return true;
@@ -145,9 +128,7 @@ namespace ShackleGear
         public void EventOnPlayerDisconnect(IServerPlayer byplayer)
         {
             if (TrackerIDs.ContainsKey(byplayer.PlayerUID)) sapi.Event.UnregisterGameTickListener(TrackerIDs[byplayer.PlayerUID]);
-#if DEBUG
-            sapi.Server.Logger.Debug("[SHACKLE-GEAR] LOGOUT EVENT FIRED\n");
-#endif
+
             foreach (var inventory in byplayer.InventoryManager.Inventories)
             {
                 string name = inventory.Value.ClassName;
@@ -156,11 +137,8 @@ namespace ShackleGear
                 {
                     if (slot is ItemSlotCreative) continue;
 
-                    if (slot?.Itemstack?.Item is ItemShackleGear && slot.Itemstack.Attributes.GetString("pearled_uid") != null)
+                    if (slot?.Itemstack?.Item is ItemShackleGear && slot.Itemstack.Attributes.GetString("shackled_uid") != null)
                     {
-#if DEBUG
-                        byplayer.Entity.World.Logger.Debug("[SHACKLE-GEAR] IDENTIFIED ITEM ON LOGOUT");
-#endif
                         ItemStack stack = slot.TakeOutWhole();
                         sapi.World.SpawnItemEntity(stack, byplayer.Entity.ServerPos.XYZ);
                     }

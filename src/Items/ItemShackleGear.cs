@@ -40,23 +40,17 @@ namespace ShackleGear.Items
         public override void OnModifiedInInventorySlot(IWorldAccessor world, ItemSlot slot, ItemStack extractedStack = null)
         {
             base.OnModifiedInInventorySlot(world, slot, extractedStack);
-#if DEBUG
-            if (world is IServerWorldAccessor)
-            {
-                //world.Logger.Debug("[SHACKLE-GEAR] Shackle Item Modified");
-            }
-#endif
         }
 
         public override void OnGroundIdle(EntityItem entityItem)
         {
             base.OnGroundIdle(entityItem);
             ITreeAttribute attribs = entityItem.Slot?.Itemstack?.Attributes;
-            if (attribs?.GetString("pearled_uid") != null)
+            if (attribs?.GetString("shackled_uid") != null)
             {
                 if (entityItem.Collided)
                 {
-                    Prsn?.FreePlayer(attribs.GetString("pearled_uid"), entityItem.Slot, true, entityItem.Pos.AsBlockPos.UpCopy());
+                    Prsn?.FreePlayer(attribs.GetString("shackled_uid"), entityItem.Slot, true, entityItem.Pos.AsBlockPos.UpCopy());
                     entityItem.Die();
                 }
             }
@@ -71,7 +65,7 @@ namespace ShackleGear.Items
             if (sapi != null && attribs != null)
             {
                 Block selBlock = pos != null ? sapi.World.BlockAccessor.GetBlock(pos) : null;
-                string uid = attribs.GetString("pearled_uid");
+                string uid = attribs.GetString("shackled_uid");
                 double cooldown = attribs.GetDouble("shackled_cell_cooldown");
 
                 if (selBlock is BlockBed)
@@ -107,7 +101,7 @@ namespace ShackleGear.Items
                     }
                     else
                     {
-                        double currentfuel = attribs.GetDouble("pearled_fuel");
+                        double currentfuel = attribs.GetDouble("shackled_fuel");
                         foreach (var invSlot in slot.Inventory)
                         {
                             if (currentfuel > maxSeconds) break;
@@ -121,13 +115,13 @@ namespace ShackleGear.Items
                                 df *= fuelMult;
                                 df *= Config.ShackleBurnMulRO;
 
-                                attribs.SetDouble("pearled_fuel", currentfuel + df);
+                                attribs.SetDouble("shackled_fuel", currentfuel + df);
                                 invSlot.TakeOut(1);
                                 invSlot.MarkDirty();
                                 slot.MarkDirty();
-                                if (attribs.GetString("pearled_uid") != null)
+                                if (attribs.GetString("shackled_uid") != null)
                                 {
-                                    Tracker.SetLastFuelerUID(attribs.GetString("pearled_uid"), (byEntity as EntityPlayer).PlayerUID);
+                                    Tracker.SetLastFuelerUID(attribs.GetString("shackled_uid"), (byEntity as EntityPlayer).PlayerUID);
                                 }
                                 break;
                             }
@@ -140,9 +134,9 @@ namespace ShackleGear.Items
         public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
         {
             ITreeAttribute attribs = inSlot?.Itemstack?.Attributes;
-            string imprisonedName = attribs?.GetString("pearled_name");
-            string imprisonedUID = attribs?.GetString("pearled_uid");
-            double fueledFor = Math.Round(attribs?.GetDouble("pearled_fuel", 0) ?? 0.0f, 3);
+            string imprisonedName = attribs?.GetString("shackled_name");
+            string imprisonedUID = attribs?.GetString("shackled_uid");
+            double fueledFor = Math.Round(attribs?.GetDouble("shackled_fuel", 0) ?? 0.0f, 3);
             double cooldown = attribs?.GetDouble("shackled_cell_cooldown") ?? 0;
             bool inCooldown = cooldown > world.Calendar.TotalHours;
             int timeLeft = (int)Math.Round(cooldown - world.Calendar.TotalHours);
@@ -159,33 +153,27 @@ namespace ShackleGear.Items
 
         public void UpdateFuelState(IWorldAccessor world, ItemSlot inSlot)
         {
-            if (inSlot == null)
-            {
-#if DEBUG
-                world.Logger.Debug("[SHACKLE-GEAR] Slot was null during update fuel state.");
-#endif
-                return;
-            }
+            if (inSlot == null) return;
 
-            if (world.Side.IsServer() && !(inSlot is ItemSlotCreative))
+            if (world.Side.IsServer() && inSlot is not ItemSlotCreative)
             {
                 ITreeAttribute attribs = inSlot?.Itemstack?.Attributes;
-                if (attribs?.GetString("pearled_uid") != null)
+                if (attribs?.GetString("shackled_uid") != null)
                 {
-                    long dt = DateTime.UtcNow.Ticks - attribs.GetLong("pearled_lastping", DateTime.UtcNow.Ticks);
-                    double fuel = attribs.GetDouble("pearled_fuel", 0.0f);
+                    long dt = DateTime.UtcNow.Ticks - attribs.GetLong("shackled_lastping", DateTime.UtcNow.Ticks);
+                    double fuel = attribs.GetDouble("shackled_fuel", 0.0f);
 
                     if (fuel < 0f)
                     {
-                        Prsn.FreePlayer(attribs.GetString("pearled_uid"), inSlot);
+                        Prsn.FreePlayer(attribs.GetString("shackled_uid"), inSlot);
                     }
                     else
                     {
-                        TimeSpan span = new TimeSpan(dt);
-                        attribs.SetDouble("pearled_fuel", fuel - span.TotalSeconds);
+                        TimeSpan span = new(dt);
+                        attribs.SetDouble("shackled_fuel", fuel - span.TotalSeconds);
                     }
 
-                    attribs.SetLong("pearled_lastping", DateTime.UtcNow.Ticks);
+                    attribs.SetLong("shackled_lastping", DateTime.UtcNow.Ticks);
                 }
                 inSlot.MarkDirty();
             }

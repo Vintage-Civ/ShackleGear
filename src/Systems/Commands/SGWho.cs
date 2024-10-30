@@ -11,7 +11,7 @@ namespace ShackleGear.Commands
         {
             if (player.InventoryManager.ActiveHotbarSlot?.Itemstack?.Item is ItemShackleGear)
             {
-                string heldplayer = player.InventoryManager.ActiveHotbarSlot.Itemstack.Attributes.GetString("pearled_name");
+                string heldplayer = player.InventoryManager.ActiveHotbarSlot.Itemstack.Attributes.GetString("shackled_name");
 
                 if (heldplayer != null) player.SendMessage(GlobalConstants.GeneralChatGroup, "The held player is " + heldplayer, EnumChatType.Notification);
                 else player.SendMessage(GlobalConstants.GeneralChatGroup, "The pearl is empty", EnumChatType.Notification);

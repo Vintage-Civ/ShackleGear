@@ -32,7 +32,7 @@ namespace ShackleGear.BlockEntityBehaviors
                     if (slot?.Itemstack?.Item is ItemShackleGear)
                     {
                         ((ItemShackleGear)slot.Itemstack.Item).UpdateFuelState(api.World, slot);
-                        string uid = slot.Itemstack.Attributes.GetString("pearled_uid");
+                        string uid = slot.Itemstack.Attributes.GetString("shackled_uid");
                         if (uid != null)
                         {
                             FullTrackData data = Tracker?.GetTrackData(uid);

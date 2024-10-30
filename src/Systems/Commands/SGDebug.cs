@@ -14,9 +14,9 @@ namespace ShackleGear.Commands
                 player.SendMessage(
                     GlobalConstants.GeneralChatGroup,
                     "Current pearled uid = " +
-                    player.InventoryManager.ActiveHotbarSlot.Itemstack.Attributes.GetString("pearled_uid") +
+                    player.InventoryManager.ActiveHotbarSlot.Itemstack.Attributes.GetString("shackled_uid") +
                     "\nCurrently pearled playername = " +
-                    player.InventoryManager.ActiveHotbarSlot.Itemstack.Attributes.GetString("pearled_name"),
+                    player.InventoryManager.ActiveHotbarSlot.Itemstack.Attributes.GetString("shackled_name"),
                     EnumChatType.Notification);
             }
         }

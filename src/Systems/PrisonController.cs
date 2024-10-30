@@ -35,9 +35,6 @@ namespace ShackleGear.Controllers
         public void FreePlayer(string uid, ItemSlot slot, bool destroy = true, BlockPos brokenAt = null)
         {
             if (sapi == null) return;
-#if DEBUG
-            sapi.Server.Logger.Debug(string.Format("[SHACKLE-GEAR] Free Function Fired, Call Stack: {0}", Environment.StackTrace));
-#endif
 
             IServerPlayer serverPlayer = sapi.World.PlayerByUid(uid) as IServerPlayer;
             if (serverPlayer != null)
@@ -177,12 +174,8 @@ namespace ShackleGear.Controllers
 
         public bool TryImprisonPlayer(IServerPlayer prisoner, IServerPlayer killer, ItemSlot slot)
         {
-            //imprison some player
-
             ITreeAttribute attribs = slot?.Itemstack?.Attributes;
-#if DEBUG
-            sapi.Server.Logger.Debug(string.Format("[SHACKLE-GEAR] Imprison Function Fired, Call Stack: {0}", Environment.StackTrace));
-#endif
+
             if (attribs == null) return false;
             long ticks = DateTime.UtcNow.Ticks;
 
@@ -190,8 +183,8 @@ namespace ShackleGear.Controllers
             
             if (tracker.IsShackled(prisoner)) return false;
 
-            attribs.SetString("pearled_uid", prisoner.PlayerUID);
-            attribs.SetString("pearled_name", prisoner.PlayerName);
+            attribs.SetString("shackled_uid", prisoner.PlayerUID);
+            attribs.SetString("shackled_name", prisoner.PlayerName);
             attribs.SetLong("pearled_timestamp", ticks);
 
             SetSpawnInAttributes(attribs, prisoner);
